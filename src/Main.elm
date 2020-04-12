@@ -1,7 +1,6 @@
 port module Main exposing (main)
 
 import Browser exposing (UrlRequest)
-import Browser.Navigation as Nav
 import Chadtech.Colors as Ct
 import Css
 import Data.ViewMode as ViewMode exposing (ViewMode)
@@ -10,9 +9,7 @@ import Html.Styled as Html exposing (Html)
 import Html.Styled.Attributes as Attrs
 import Json.Decode as Decode
 import Json.Encode as Encode
-import Route exposing (Route)
 import Style
-import Url exposing (Url)
 import View.Button as Button
 
 
@@ -28,8 +25,6 @@ type alias Model =
 
 type Msg
     = DownloadAsPdfClicked
-    | RouteChanged Route
-    | UrlRequested UrlRequest
 
 
 
@@ -44,20 +39,13 @@ main =
     , view = view
     , update = update
     , subscriptions = \_ -> Sub.none
-    , onUrlRequest = UrlRequested
-    , onUrlChange = Route.parse >> RouteChanged
     }
-        |> Browser.application
+        |> Browser.document
 
 
-init : Decode.Value -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init json url _ =
-    ( { viewMode =
-            Decode.decodeValue
-                (Decode.field "viewMode" ViewMode.decoder)
-                json
-                |> Result.withDefault ViewMode.web
-      }
+init : Decode.Value -> ( Model, Cmd Msg )
+init _ =
+    ( { viewMode = ViewMode.flag__web }
     , Cmd.none
     )
 
@@ -76,17 +64,6 @@ update msg model =
             , downloadAsPdf
                 { url = "http://chad-stearns-resume.surge.sh/chad_stearns_resume.pdf" }
             )
-
-        RouteChanged route ->
-            ( model, Cmd.none )
-
-        UrlRequested urlRequest ->
-            case urlRequest of
-                Browser.External url ->
-                    ( model, Nav.load url )
-
-                Browser.Internal _ ->
-                    ( model, Cmd.none )
 
 
 
@@ -186,23 +163,19 @@ resume =
             , ctPaint
             , listExtra
             , elmCanvas
+            , forbesNashMachine
             ]
                 |> List.concat
                 |> (::) (header [] "projects")
 
         resumeGithubLink : Html msg
         resumeGithubLink =
-            let
-                url : String
-                url =
-                    "github.com/chadtech/resume"
-            in
             Html.a
-                [ Attrs.href url
+                [ Attrs.href "https://www.github.com/chadtech/resume"
                 , Attrs.css
                     [ Css.color Ct.content0 ]
                 ]
-                [ Html.text url ]
+                [ Html.text "github.com/chadtech/resume" ]
     in
     [ Grid.row
         [ Style.padding small
@@ -270,12 +243,16 @@ projectTitle :
     -> Html msg
 projectTitle params =
     let
+        textColor : Css.Style
+        textColor =
+            Css.color Ct.content4
+
         nameView : Html msg
         nameView =
             case params.url of
                 Just url ->
                     Html.a
-                        [ Attrs.css [ Css.color Ct.content5 ]
+                        [ Attrs.css [ textColor ]
                         , Attrs.href url
                         ]
                         [ Html.text params.name ]
@@ -283,7 +260,7 @@ projectTitle params =
                 Nothing ->
                     Html.span
                         [ Attrs.css
-                            [ Css.color Ct.content5
+                            [ textColor
                             , Css.whiteSpace Css.noWrap
                             ]
                         ]
@@ -340,6 +317,16 @@ elmCanvas =
         { name = "elm-canvas"
         , url = Just "https://github.com/Elm-Canvas/elm-canvas"
         , description = "html canvas in the Elm programming language."
+        }
+    ]
+
+
+forbesNashMachine : List (Html msg)
+forbesNashMachine =
+    [ projectTitle
+        { name = "Solafide Forbes Nash Machine"
+        , url = Just "https://hackaday.com/2014/05/20/the-solafide-forbes-nash-organ/"
+        , description = "48 key analog synthesizer."
         }
     ]
 

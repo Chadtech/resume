@@ -13,8 +13,9 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "gulp"
+    "start": "gulp",
+    "build-pdf": "sed -i \\\"\\\" 's/flag__web/flag__pdf/g' ./src/Main.elm && gulp build",
+    "build": "sed -i \\\"\\\" 's/flag__pdf/flag__web/g' ./src/Main.elm && gulp build"
   },
   "author": "Chadtech",
   "license": "ISC"

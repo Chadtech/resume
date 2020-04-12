@@ -43,19 +43,19 @@ gulp.task("server", function () {
   return require("./server")(2957, util.log);
 });
 
+/*
+for PDF
+surge /Users/Chadtech/code/2020-resume/public chad-stearns-resume-pdf.surge.sh
 
-gulp.task("dist", function () {
-  production = true;
-  gulp.task("default");
+for website
+surge /Users/Chadtech/code/2020-resume/public chad-stearns-resume.surge.sh
+*/
 
-  return gulp
-    .src(paths.public + "/**/*")
-    .pipe(gulp.dest(paths.dist));
+gulp.task("watch", function() {
+  gulp.watch(paths.elm, ["elm"]);
+  gulp.watch(paths.js, ["js"]);
 })
 
 
-gulp.watch(paths.elm, ["elm"]);
-gulp.watch(paths.js, ["js"]);
-
-
-gulp.task("default", ["elm", "js", "server"]);
+gulp.task("default", ["elm", "js", "watch", "server"]);
+gulp.task("build", ["elm", "js"] )

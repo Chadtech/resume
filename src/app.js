@@ -1,13 +1,6 @@
-var app = Elm.Main.init({
-    flags: {
-        viewMode: "pdf"
-//        viewMode: "web"
-    }
-});
+var app = Elm.Main.init();
 
 app.ports.downloadAsPdfInternal.subscribe(function(params){
-    window.open(
-        "https://www.sejda.com/html-to-pdf?save-link=" + params.url + "?viewportWidth=850",
-    );
+    window.open(params.url);
 })
 

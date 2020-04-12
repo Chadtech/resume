@@ -1,8 +1,8 @@
 module Data.ViewMode exposing
     ( ViewMode(..)
     , decoder
-    , pdf
-    , web
+    , flag__pdf
+    , flag__web
     )
 
 import Json.Decode as Decode exposing (Decoder)
@@ -25,13 +25,13 @@ type ViewMode
 --------------------------------------------------------------------------------
 
 
-pdf : ViewMode
-pdf =
+flag__pdf : ViewMode
+flag__pdf =
     Pdf
 
 
-web : ViewMode
-web =
+flag__web : ViewMode
+flag__web =
     Web
 
 
