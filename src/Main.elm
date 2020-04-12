@@ -181,6 +181,7 @@ resume =
         [ Style.padding small
         , Css.borderBottom3 (Style.px 0) Css.solid Ct.content4
         , Css.backgroundColor Ct.content4
+        , safariBugFix
         ]
         [ Grid.column
             [ Style.fontSize 6
@@ -200,13 +201,16 @@ resume =
     , Grid.row
         [ Style.padding small
         , Css.borderBottom3 (Style.px 0) Css.solid Ct.content4
+        , safariBugFix
         ]
         [ Grid.column
             [ Css.flexDirection Css.column ]
             projects
         ]
     , Grid.row
-        [ Css.flex (Css.int 1) ]
+        [ Css.flex (Css.int 1)
+        , safariBugFix
+        ]
         [ Grid.column
             [ Css.flex (Css.int 0)
             , Css.flexBasis Css.initial
@@ -417,7 +421,10 @@ jobDetail content =
 keyValueText : String -> String -> Html msg
 keyValueText key value =
     Grid.row
-        [ Style.marginTop small ]
+        [ Style.marginTop small
+        , Css.flexBasis Css.auto
+        , Css.flexShrink (Css.int 0)
+        ]
         [ textColumn
             [ Style.marginRight medium
             , Css.flex Css.initial
@@ -437,7 +444,9 @@ talks =
         linkRow : String -> String -> Html msg
         linkRow name url =
             Grid.row
-                [ Style.marginTop small ]
+                [ Style.marginTop small
+                , safariBugFix
+                ]
                 [ Grid.column
                     []
                     [ Html.a
@@ -467,7 +476,9 @@ competitions =
     in
     [ header [ Style.marginTop 3 ] "competitions"
     , Grid.row
-        [ Style.marginTop small ]
+        [ Style.marginTop small
+        , safariBugFix
+        ]
         [ Grid.column
             []
             [ Html.a
@@ -477,7 +488,9 @@ competitions =
         , won
         ]
     , Grid.row
-        [ Style.marginTop small ]
+        [ Style.marginTop small
+        , safariBugFix
+        ]
         [ textColumn [] "Html Game Hackathon"
         , won
         ]
@@ -490,7 +503,9 @@ meetUps =
         nameAndRole : String -> String -> Html msg
         nameAndRole name role =
             Grid.row
-                [ Style.marginTop small ]
+                [ Style.marginTop small
+                , safariBugFix
+                ]
                 [ textColumn
                     [ Css.flex (Css.int 0)
                     , Style.noWrap
@@ -539,6 +554,7 @@ contacts =
             Grid.row
                 [ Style.fullWidth
                 , Style.marginBottom small
+                , safariBugFix
                 ]
                 [ textColumn
                     [ Style.marginRight medium
@@ -577,7 +593,17 @@ textColumn styles text =
 
 textRow : List Css.Style -> List Css.Style -> String -> Html msg
 textRow rowStyles columnStyles text =
-    Grid.row rowStyles [ textColumn columnStyles text ]
+    Grid.row
+        (safariBugFix :: rowStyles)
+        [ textColumn columnStyles text ]
+
+
+safariBugFix : Css.Style
+safariBugFix =
+    [ Css.flexBasis Css.auto
+    , Css.flexShrink (Css.int 0)
+    ]
+        |> Css.batch
 
 
 small : Int
