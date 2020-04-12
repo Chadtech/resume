@@ -45,10 +45,10 @@ gulp.task("server", function () {
 
 /*
 for PDF
-surge /Users/Chadtech/code/2020-resume/public chad-stearns-resume-pdf.surge.sh
+npm run build-pdf && surge /Users/Chadtech/code/2020-resume/public chad-stearns-resume-pdf.surge.sh
 
 for website
-surge /Users/Chadtech/code/2020-resume/public chad-stearns-resume.surge.sh
+npm run build && surge /Users/Chadtech/code/2020-resume/public chad-stearns-resume.surge.sh
 */
 
 gulp.task("watch", function() {

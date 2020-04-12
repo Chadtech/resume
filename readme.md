@@ -6,7 +6,7 @@ All the important stuff is at `./src/Main.elm`.
 
 
 # Install and Run
-You will need gulp installed to run this project.
+You will need to have gulp installed on your machine to run this project.
 
 Type..
 ```

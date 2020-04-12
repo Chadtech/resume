@@ -304,7 +304,7 @@ ctPaint =
 listExtra : List (Html msg)
 listExtra =
     [ projectTitle
-        { name = "elm/list-extra"
+        { name = "list-extra"
         , url = Just "https://package.elm-lang.org/packages/elm-community/list-extra/latest/"
         , description = "list helper functions; one of the most used Elm packages."
         }
