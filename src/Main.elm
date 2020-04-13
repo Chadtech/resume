@@ -176,31 +176,34 @@ resume =
                     [ Css.color Ct.content0 ]
                 ]
                 [ Html.text "github.com/chadtech/resume" ]
+
+        topHeader : Html msg
+        topHeader =
+            Grid.row
+                [ Style.padding small
+                , Css.backgroundColor Ct.content4
+                , safariBugFix
+                ]
+                [ Grid.column
+                    [ Style.fontSize 6
+                    , Css.color Ct.content0
+                    ]
+                    [ Html.text "Chad Stearns" ]
+                , Grid.column
+                    [ Css.displayFlex
+                    , Css.flexDirection Css.column
+                    , Css.justifyContent Css.center
+                    , Css.textAlign Css.right
+                    , Style.paddingRight medium
+                    , Css.color Ct.content0
+                    ]
+                    [ resumeGithubLink ]
+                ]
     in
-    [ Grid.row
-        [ Style.padding small
-        , Css.borderBottom3 (Style.px 0) Css.solid Ct.content4
-        , Css.backgroundColor Ct.content4
-        , safariBugFix
-        ]
-        [ Grid.column
-            [ Style.fontSize 6
-            , Css.color Ct.content0
-            ]
-            [ Html.text "Chad Stearns" ]
-        , Grid.column
-            [ Css.displayFlex
-            , Css.flexDirection Css.column
-            , Css.justifyContent Css.center
-            , Css.textAlign Css.right
-            , Style.paddingRight medium
-            , Css.color Ct.content0
-            ]
-            [ resumeGithubLink ]
-        ]
+    [ topHeader
     , Grid.row
         [ Style.padding small
-        , Css.borderBottom3 (Style.px 0) Css.solid Ct.content4
+        , Css.borderBottom3 (Style.px 1) Css.solid Ct.content4
         , safariBugFix
         ]
         [ Grid.column
@@ -214,7 +217,7 @@ resume =
         [ Grid.column
             [ Css.flex (Css.int 0)
             , Css.flexBasis Css.initial
-            , Css.borderRight3 (Style.px 0) Css.solid Ct.content4
+            , Css.borderRight3 (Style.px 1) Css.solid Ct.content4
             , Css.flexDirection Css.column
             , Style.padding small
             ]
@@ -571,7 +574,6 @@ contacts =
                 ]
     in
     [ ( "phone", "480 450 6514" )
-    , ( "twitter", "@TheRealChadtech" )
     , ( "email", "chadtech0@gmail.com" )
     ]
         |> List.map contact
