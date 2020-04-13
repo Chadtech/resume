@@ -96,8 +96,8 @@ webBody : List (Html Msg)
 webBody =
     [ Grid.row
         [ Css.flex (Css.int 1)
-        , Style.padding 5
-        , Style.paddingBottom 3
+        , Style.padding (large + 1)
+        , Style.paddingBottom medium
         , Css.justifyContent Css.center
         , Css.minHeight (Css.px 0)
         ]
@@ -113,8 +113,8 @@ webBody =
             resume
         ]
     , Grid.row
-        [ Style.padding 5
-        , Style.paddingTop 3
+        [ Style.padding (large + 1)
+        , Style.paddingTop medium
         , Css.justifyContent Css.center
         ]
         [ Grid.column
@@ -138,11 +138,10 @@ resume =
     let
         leftColumn : List (Html msg)
         leftColumn =
-            [ contacts
-            , talks
-            , education
+            [ talks
             , meetUps
-            , competitions
+            , awards
+            , education
             ]
                 |> List.concat
 
@@ -177,30 +176,53 @@ resume =
                 ]
                 [ Html.text "github.com/chadtech/resume" ]
 
-        topHeader : Html msg
-        topHeader =
+        contact : ( String, String ) -> Html msg
+        contact ( method, value ) =
+            textRow
+                [ Style.paddingBottom 1 ]
+                [ Css.color Ct.content0
+                , Css.whiteSpace Css.noWrap
+                ]
+                (method ++ ": " ++ value)
+
+        name : Html msg
+        name =
             Grid.row
                 [ Style.padding small
                 , Css.backgroundColor Ct.content4
                 , safariBugFix
                 ]
                 [ Grid.column
-                    [ Style.fontSize 6
-                    , Css.color Ct.content0
+                    [ Css.flexDirection Css.column ]
+                    [ textRow
+                        []
+                        [ Style.fontSize 6
+                        , Css.color Ct.content0
+                        ]
+                        "Chad Stearns"
+                    , Grid.row
+                        [ Style.padding small
+                        , Css.paddingTop Style.zero
+                        , Css.backgroundColor Ct.content4
+                        , safariBugFix
+                        ]
+                        [ Grid.column
+                            [ Css.color Ct.content0 ]
+                            [ resumeGithubLink ]
+                        ]
                     ]
-                    [ Html.text "Chad Stearns" ]
                 , Grid.column
-                    [ Css.displayFlex
-                    , Css.flexDirection Css.column
-                    , Css.justifyContent Css.center
-                    , Css.textAlign Css.right
-                    , Style.paddingRight medium
-                    , Css.color Ct.content0
+                    [ Css.flexDirection Css.column
+                    , Css.flex (Css.int 0)
                     ]
-                    [ resumeGithubLink ]
+                    (List.map contact
+                        [ ( "phone", "+ 1480 450 6514" )
+                        , ( "email", "chadtech0@gmail.com" )
+                        ]
+                    )
                 ]
     in
-    [ topHeader
+    [ name
     , Grid.row
         [ Style.padding small
         , Css.borderBottom3 (Style.px 1) Css.solid Ct.content4
@@ -359,7 +381,7 @@ jobTitle extraStyles =
 
 shore : List (Html msg)
 shore =
-    [ jobTitle [ Style.marginTop medium ] "Shore GmbH, Senior Software Developer"
+    [ jobTitle [ Style.marginTop large ] "Shore GmbH, Senior Software Developer"
     , jobDuration "August 2017" "November 2018"
     , tech "Elm, JavaScript, React, TypeScript"
     , textRow
@@ -373,7 +395,7 @@ shore =
 
 chadtech : List (Html msg)
 chadtech =
-    [ jobTitle [ Style.marginTop medium ] "Chadtech Co, CEO"
+    [ jobTitle [ Style.marginTop large ] "Chadtech Co, CEO"
     , jobDuration "October 2013" "present"
     , tech "Hardware, Elm, JavaScript, React, Go, C++"
     , jobDetail "Primarily front end client work for start ups"
@@ -384,7 +406,7 @@ chadtech =
 
 localMotors : List (Html msg)
 localMotors =
-    [ jobTitle [ Style.marginTop medium ] "Local Motors, Lab Manager"
+    [ jobTitle [ Style.marginTop large ] "Local Motors, Lab Manager"
     , jobDuration "February 2015" "Sept 2015"
     , tech "3D printing, CAD, CNC machining, Electronics, JavaScript, React"
     , textRow
@@ -429,7 +451,7 @@ keyValueText key value =
         , Css.flexShrink (Css.int 0)
         ]
         [ textColumn
-            [ Style.marginRight medium
+            [ Style.marginRight large
             , Css.flex Css.initial
             , Css.color Ct.content3
             ]
@@ -458,7 +480,7 @@ talks =
                     ]
                 ]
     in
-    [ header [ Style.marginTop 3 ] "talks"
+    [ header [] "talks"
     , linkRow "Elm Europe 2019" "https://www.youtube.com/watch?v=RFCPAw5C5hQ"
     , linkRow "Desert Code Camp 2016" "https://youtu.be/e6jzkoGeDEs"
     , textRow [ Style.marginTop small ] [] "QueensJS 2016"
@@ -466,38 +488,51 @@ talks =
     ]
 
 
-competitions : List (Html msg)
-competitions =
+awards : List (Html msg)
+awards =
     let
-        won : Grid.Column msg
-        won =
-            textColumn
-                [ Css.color Ct.content3
-                , Css.flex (Css.int 0)
+        award :
+            { name : String
+            , year : String
+            , url : Maybe String
+            }
+            -> Html msg
+        award params =
+            let
+                name : Html msg
+                name =
+                    case params.url of
+                        Just url ->
+                            Html.a
+                                [ Attrs.href url ]
+                                [ Html.text params.name ]
+
+                        Nothing ->
+                            Html.text params.name
+            in
+            Grid.row
+                [ Style.marginTop small
+                , safariBugFix
                 ]
-                "won"
+                [ Grid.column [] [ name ]
+                , textColumn
+                    [ Css.color Ct.content3
+                    , Css.flex (Css.int 0)
+                    ]
+                    params.year
+                ]
     in
-    [ header [ Style.marginTop 3 ] "competitions"
-    , Grid.row
-        [ Style.marginTop small
-        , safariBugFix
-        ]
-        [ Grid.column
-            []
-            [ Html.a
-                [ Attrs.href "https://imgur.com/QfDKg7P" ]
-                [ Html.text "Arduino Wearables" ]
-            ]
-        , won
-        ]
-    , Grid.row
-        [ Style.marginTop small
-        , safariBugFix
-        ]
-        [ textColumn [] "Html Game Hackathon"
-        , won
-        ]
+    [ { name = "Arduino Wearables"
+      , year = "2014"
+      , url = Just "https://imgur.com/QfDKg7P"
+      }
+    , { name = "Html Game Hackathon"
+      , year = "2012"
+      , url = Nothing
+      }
     ]
+        |> List.map award
+        |> (::) (header [ Style.marginTop medium ] "awards")
 
 
 meetUps : List (Html msg)
@@ -516,18 +551,17 @@ meetUps =
                     name
                 , textColumn
                     [ Css.color Ct.content3
-                    , Style.marginLeft 3
+                    , Css.justifyContent Css.flexEnd
                     ]
                     role
                 ]
     in
-    [ header [ Style.marginTop 3 ] "meet ups"
+    [ header [ Style.marginTop medium ] "meet ups"
     , nameAndRole "Rust Philadelphia" ""
     , nameAndRole "Elm |> Munich" "organizer"
     , nameAndRole "Elm NYC" "regular speaker"
     , nameAndRole "Coffee & Code" "host"
     , nameAndRole "Phoenix ReactJS" "organizer"
-    , nameAndRole "3D printing night" "organizer"
     , nameAndRole "LM Labs" "organizer"
     , nameAndRole "NodeAZ" "regular speaker"
     ]
@@ -536,48 +570,19 @@ meetUps =
 education : List (Html msg)
 education =
     let
-        row : String -> Html msg
-        row text =
-            textRow [ Style.marginBottom 2 ] [] text
+        row : ( Css.Color, String ) -> Html msg
+        row ( color, text ) =
+            textRow
+                [ Style.marginTop small ]
+                [ Css.color color ]
+                text
     in
-    [ "B.S. Economics"
-    , "Arizona State University"
-    , "Dec 2013"
+    [ ( Ct.content4, "B.S. Economics" )
+    , ( Ct.content3, "Arizona State University" )
+    , ( Ct.content3, "Dec 2013" )
     ]
         |> List.map row
-        |> (::)
-            (header [ Style.marginTop 3 ] "education")
-
-
-contacts : List (Html msg)
-contacts =
-    let
-        contact : ( String, String ) -> Html msg
-        contact ( method, value ) =
-            Grid.row
-                [ Style.fullWidth
-                , Style.marginBottom small
-                , safariBugFix
-                ]
-                [ textColumn
-                    [ Style.marginRight medium
-                    , Style.width 6
-                    , Css.flex Css.initial
-                    ]
-                    method
-                , textColumn
-                    [ Style.noWrap
-                    , Css.justifyContent Css.flexEnd
-                    , Css.color Ct.content5
-                    ]
-                    value
-                ]
-    in
-    [ ( "phone", "480 450 6514" )
-    , ( "email", "chadtech0@gmail.com" )
-    ]
-        |> List.map contact
-        |> (::) (header [] "contact info")
+        |> (::) (header [ Style.marginTop medium ] "education")
 
 
 header : List Css.Style -> String -> Html msg
@@ -615,6 +620,11 @@ small =
 
 medium : Int
 medium =
+    3
+
+
+large : Int
+large =
     4
 
 

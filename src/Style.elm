@@ -21,6 +21,7 @@ module Style exposing
     , outdent
     , padding
     , paddingBottom
+    , paddingLeft
     , paddingRight
     , paddingTop
     , px
@@ -93,6 +94,11 @@ padding =
 paddingBottom : Int -> Css.Style
 paddingBottom =
     Css.paddingBottom << px
+
+
+paddingLeft : Int -> Css.Style
+paddingLeft =
+    Css.paddingLeft << px
 
 
 paddingTop : Int -> Css.Style
