@@ -1,5 +1,6 @@
 module Style exposing
-    ( borderNone
+    ( borderBottom
+    , borderNone
     , center
     , fontSize
     , fontSmoothingNone
@@ -208,7 +209,7 @@ indent =
     [ borderLeft3 (px 1) solid Ct.content0
     , borderTop3 (px 1) solid Ct.content0
     , borderRight3 (px 1) solid Ct.content2
-    , borderBottom3 (px 1) solid Ct.content2
+    , borderBottom Ct.content2
     ]
         |> Css.batch
 
@@ -218,9 +219,14 @@ outdent =
     [ borderLeft3 (px 1) solid Ct.content2
     , borderTop3 (px 1) solid Ct.content2
     , borderRight3 (px 1) solid Ct.content0
-    , borderBottom3 (px 1) solid Ct.content0
+    , borderBottom Ct.content0
     ]
         |> Css.batch
+
+
+borderBottom : Css.Color -> Css.Style
+borderBottom =
+    borderBottom3 (px 1) solid
 
 
 hfnss : Style

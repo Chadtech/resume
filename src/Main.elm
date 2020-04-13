@@ -141,6 +141,7 @@ resume =
             [ talks
             , meetUps
             , awards
+            , volunteer
             , education
             ]
                 |> List.concat
@@ -216,7 +217,7 @@ resume =
                     , Css.flex (Css.int 0)
                     ]
                     (List.map contact
-                        [ ( "phone", "+ 1480 450 6514" )
+                        [ ( "phone", "+1 480 450 6514" )
                         , ( "email", "chadtech0@gmail.com" )
                         ]
                     )
@@ -333,7 +334,7 @@ ctPaint =
 listExtra : List (Html msg)
 listExtra =
     [ projectTitle
-        { name = "list-extra"
+        { name = "elm-community/list-extra"
         , url = Just "https://package.elm-lang.org/packages/elm-community/list-extra/latest/"
         , description = "list helper functions; one of the most used Elm packages."
         }
@@ -357,6 +358,7 @@ forbesNashMachine =
         , url = Just "https://hackaday.com/2014/05/20/the-solafide-forbes-nash-organ/"
         , description = "48 key analog synthesizer."
         }
+    , tech "Electronics"
     ]
 
 
@@ -368,15 +370,34 @@ humio =
     , textRow
         [ Style.marginTop small ]
         []
-        "High speed data querying of enormous volumes of log data for enterprise customers."
+        """
+        Humio provides high performance data querying to large enterprise customers (Bloomberg, Netlify).
+        On a 25 node system, Humio can query 2.2 million events per second and ingest 100 TB of data a day.
+        """
     , jobDetail
-        "Lead development for key functionality of large technical user interface."
+        "Responsible for key functionality such as complex infinite scrolling and plugin system."
+    , jobDetail
+        "Exemplified team standard for code review and pull request descriptions."
+    , jobDetail
+        "Designed and implemented broad architecture of large front end code base."
     ]
 
 
 jobTitle : List Css.Style -> String -> Html msg
 jobTitle extraStyles =
-    textRow [] (Css.color Ct.important1 :: extraStyles)
+    let
+        color : Css.Color
+        color =
+            Ct.important1
+    in
+    textRow
+        [ Style.borderBottom color
+        ]
+        (Css.color color :: extraStyles)
+
+
+
+--(String.join " " [ "--", jobText, String.repeat 40 "-" ])
 
 
 shore : List (Html msg)
@@ -387,9 +408,11 @@ shore =
     , textRow
         [ Style.marginTop small ]
         []
-        "Scheduling and appointment software for small businesses and their customers."
+        "Shore is scheduling and appointment software for small businesses and their customers."
     , jobDetail
-        "Created core application that was served to thousands of users."
+        "Created core appointment application that was served to thousands of users."
+    , jobDetail
+        "Maintained large calendar user interface and skeleton \"app shell\" architecture."
     ]
 
 
@@ -398,9 +421,12 @@ chadtech =
     [ jobTitle [ Style.marginTop large ] "Chadtech Co, CEO"
     , jobDuration "October 2013" "present"
     , tech "Hardware, Elm, JavaScript, React, Go, C++"
-    , jobDetail "Primarily front end client work for start ups"
-    , jobDetail "Ambitious kickstarter for software project."
-    , jobDetail "High performance audio processing code for immersive online car advertisements."
+    , textRow
+        [ Style.marginTop small ]
+        []
+        "My consulting business entity. My primary service was front end client work for start ups."
+    , jobDetail "Ran ambitious kickstarter for own software product."
+    , jobDetail "Wrote high performance audio processing code for immersive video online car reports."
     ]
 
 
@@ -412,19 +438,39 @@ localMotors =
     , textRow
         [ Style.marginTop small ]
         []
-        "Experimental car manufacturer using crowd sourced engineering work and maker of the world's first 3D printed car."
+        "Local Motors is an experimental car manufacturer that pioneered crowd sourced engineering and made the world's first 3D printed car."
     , jobDetail
         "Built eletronic and computer components for automotive engineering initiatives."
     , jobDetail
-        "Taught classes on CNC milling and 3D Printing"
+        "Taught classes on CNC milling and 3D Printing."
     , jobDetail
-        "Ambassador to local community and governance"
+        "Ambassador to local community and governance."
     ]
 
 
 tech : String -> Html msg
-tech =
-    keyValueText "tech:"
+tech techItems =
+    let
+        color : Css.Style
+        color =
+            Css.color Ct.content4
+    in
+    Grid.row
+        [ Style.marginTop small
+        , Css.flexBasis Css.auto
+        , Css.flexShrink (Css.int 0)
+        ]
+        [ textColumn
+            [ Style.marginRight large
+            , Css.flex Css.initial
+            , Css.color Ct.content3
+            ]
+            "tech:"
+        , textColumn
+            [ Css.color Ct.problem1
+            ]
+            techItems
+        ]
 
 
 jobDuration : String -> String -> Html msg
@@ -443,49 +489,65 @@ jobDetail content =
         ("- " ++ content)
 
 
-keyValueText : String -> String -> Html msg
-keyValueText key value =
-    Grid.row
-        [ Style.marginTop small
-        , Css.flexBasis Css.auto
-        , Css.flexShrink (Css.int 0)
-        ]
-        [ textColumn
-            [ Style.marginRight large
-            , Css.flex Css.initial
-            , Css.color Ct.content3
-            ]
-            key
-        , textColumn
-            [ Css.color Ct.content3
-            ]
-            value
-        ]
-
-
 talks : List (Html msg)
 talks =
     let
-        linkRow : String -> String -> Html msg
-        linkRow name url =
+        link : String -> String -> Html msg
+        link name url =
+            Html.a
+                [ Attrs.href url ]
+                [ Html.text name ]
+
+        row :
+            { name : String
+            , url : Maybe String
+            , year : String
+            }
+            -> Html msg
+        row params =
+            let
+                name : Html msg
+                name =
+                    case params.url of
+                        Just url ->
+                            link params.name url
+
+                        Nothing ->
+                            Html.text params.name
+            in
             Grid.row
                 [ Style.marginTop small
                 , safariBugFix
                 ]
                 [ Grid.column
-                    []
-                    [ Html.a
-                        [ Attrs.href url ]
-                        [ Html.text name ]
+                    [ Css.flex (Css.int 0)
+                    , Style.noWrap
                     ]
+                    [ name ]
+                , textColumn
+                    [ Css.color Ct.content3
+                    , Css.justifyContent Css.flexEnd
+                    ]
+                    params.year
                 ]
     in
-    [ header [] "talks"
-    , linkRow "Elm Europe 2019" "https://www.youtube.com/watch?v=RFCPAw5C5hQ"
-    , linkRow "Desert Code Camp 2016" "https://youtu.be/e6jzkoGeDEs"
-    , textRow [ Style.marginTop small ] [] "QueensJS 2016"
-    , textRow [ Style.marginTop small ] [] "29C3 2012"
+    [ { name = "Elm Europe"
+      , url = Just "https://www.youtube.com/watch?v=RFCPAw5C5hQ"
+      , year = "2019"
+      }
+    , { name = "Munich Frontend"
+      , url = Nothing
+      , year = "2018"
+      }
+    , { name = "Desert Code Camp"
+      , url = Just "https://youtu.be/e6jzkoGeDEs"
+      , year = "2016"
+      }
+    , { name = "QueensJS", url = Nothing, year = "2016" }
+    , { name = "29C3", url = Nothing, year = "2012" }
     ]
+        |> List.map row
+        |> (::) (header [] "talks")
 
 
 awards : List (Html msg)
@@ -535,6 +597,31 @@ awards =
         |> (::) (header [ Style.marginTop medium ] "awards")
 
 
+volunteer : List (Html msg)
+volunteer =
+    let
+        row : ( Css.Color, String ) -> Html msg
+        row ( color, text ) =
+            textRow
+                [ Style.marginTop small ]
+                [ Css.color color
+                , Style.width 0
+                ]
+                text
+
+        detailsRow : String -> Html msg
+        detailsRow text =
+            row ( Ct.content3, text )
+    in
+    [ header [ Style.marginTop medium ] "volunteering"
+    , row ( Ct.content4, "HeatSync Labs" )
+    , detailsRow "May 2012 - April 2014"
+    , detailsRow "501(c)3 non-profit"
+    , detailsRow "treasurer"
+    , detailsRow "~$30k in annual revenue"
+    ]
+
+
 meetUps : List (Html msg)
 meetUps =
     let
@@ -561,7 +648,7 @@ meetUps =
     , nameAndRole "Elm |> Munich" "organizer"
     , nameAndRole "Elm NYC" "regular speaker"
     , nameAndRole "Coffee & Code" "host"
-    , nameAndRole "Phoenix ReactJS" "organizer"
+    , nameAndRole "Phx ReactJS" "organizer"
     , nameAndRole "LM Labs" "organizer"
     , nameAndRole "NodeAZ" "regular speaker"
     ]
