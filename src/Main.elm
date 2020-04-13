@@ -450,11 +450,6 @@ localMotors =
 
 tech : String -> Html msg
 tech techItems =
-    let
-        color : Css.Style
-        color =
-            Css.color Ct.content4
-    in
     Grid.row
         [ Style.marginTop small
         , Css.flexBasis Css.auto
