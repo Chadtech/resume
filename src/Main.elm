@@ -396,10 +396,6 @@ jobTitle extraStyles =
         (Css.color color :: extraStyles)
 
 
-
---(String.join " " [ "--", jobText, String.repeat 40 "-" ])
-
-
 shore : List (Html msg)
 shore =
     [ jobTitle [ Style.marginTop large ] "Shore GmbH, Senior Software Developer"
@@ -440,7 +436,7 @@ localMotors =
         []
         "Local Motors is an experimental car manufacturer that pioneered crowd sourced engineering and made the world's first 3D printed car."
     , jobDetail
-        "Built eletronic and computer components for automotive engineering initiatives."
+        "Built electronic and computer components for automotive engineering initiatives."
     , jobDetail
         "Taught classes on CNC milling and 3D Printing."
     , jobDetail
