@@ -3,7 +3,6 @@ module View.Card exposing
     , Msg
     , Payload
     , body
-    , closeButton
     , decoder
     , encode
     , header
@@ -27,11 +26,9 @@ import Html.Events.Extra.Mouse as Mouse
 import Html.Grid as Grid
 import Html.Styled as Html exposing (Attribute, Html)
 import Html.Styled.Attributes as Attrs
-import Html.Styled.Events as Events
 import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 import Style as Style
-import View.Button as Button
 
 
 
@@ -210,20 +207,6 @@ headerTitle str =
     Html.p
         [ Attrs.css [ headerTextStyle ] ]
         [ Html.text str ]
-
-
-closeButton : msg -> Html msg
-closeButton msg =
-    Button.view
-        [ Attrs.css
-            [ Style.width 4
-            , Style.minWidth 4
-            , Css.padding Css.zero
-            , Css.paddingBottom (Css.px 2)
-            ]
-        , Events.onClick msg
-        ]
-        "x"
 
 
 headerCloseButton : Html msg

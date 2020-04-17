@@ -3,6 +3,7 @@ module Data.ViewMode exposing
     , decoder
     , flag__pdf
     , flag__web
+    , twitter
     )
 
 import Json.Decode as Decode exposing (Decoder)
@@ -17,6 +18,7 @@ import Json.Decode as Decode exposing (Decoder)
 type ViewMode
     = Pdf
     | Web
+    | Twitter
 
 
 
@@ -33,6 +35,11 @@ flag__pdf =
 flag__web : ViewMode
 flag__web =
     Web
+
+
+twitter : ViewMode
+twitter =
+    Twitter
 
 
 decoder : Decoder ViewMode

@@ -11,6 +11,7 @@ import Json.Decode as Decode
 import Json.Encode as Encode
 import Style
 import View.Button as Button
+import View.Card as Card
 
 
 
@@ -45,7 +46,7 @@ main =
 
 init : Decode.Value -> ( Model, Cmd Msg )
 init _ =
-    ( { viewMode = ViewMode.flag__web }
+    ( { viewMode = ViewMode.twitter }
     , Cmd.none
     )
 
@@ -85,11 +86,63 @@ view model =
 
                     ViewMode.Pdf ->
                         resume
+
+                    ViewMode.Twitter ->
+                        twitter
         in
         Style.globals model.viewMode
             :: body
             |> List.map Html.toUnstyled
     }
+
+
+twitter : List (Html msg)
+twitter =
+    let
+        row : String -> Html msg
+        row =
+            textRow [ Style.marginTop 3 ] []
+
+        goodAt : List (Html msg)
+        goodAt =
+            [ "- Frontend development, especially large complex architecture"
+            , "- Clean, maintainable, bug free code"
+            , "- Functional programming (Elm, Haskell)"
+            , "- \"Soft skills\", mentoring, sharing ideas, experimenting"
+            , "- Working towards the customer value"
+            ]
+                |> List.map row
+                |> (::)
+                    (textRow [] [ Css.color Ct.important0 ] "What I am good at:")
+
+        lookingFor : List (Html msg)
+        lookingFor =
+            [ "- Full time, preferably remote work"
+            , "- New domains and personal growth, (backend code, lead roles)"
+            ]
+                |> List.map row
+                |> (::)
+                    (textRow [ Style.marginTop 3 ] [ Css.color Ct.important0 ] "What I am looking for:")
+    in
+    [ Grid.row
+        [ Css.flex (Css.int 1)
+        , Css.justifyContent Css.center
+        , Style.fullWidth
+        ]
+        [ Grid.column
+            [ Css.flex (Css.int 0)
+            , Css.flexDirection Css.column
+            , Css.justifyContent Css.center
+            ]
+            [ Card.view
+                [ Style.width 9 ]
+                [ Card.body
+                    [ Style.padding 3 ]
+                    (goodAt ++ lookingFor)
+                ]
+            ]
+        ]
+    ]
 
 
 webBody : List (Html Msg)

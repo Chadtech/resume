@@ -162,6 +162,9 @@ globals viewMode =
                     , fullHeight
                     ]
                         |> Css.batch
+
+                ViewMode.Twitter ->
+                    backgroundColor Ct.background1
     in
     [ Css.Global.button
         [ hfnss
