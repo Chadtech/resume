@@ -46,7 +46,7 @@ main =
 
 init : Decode.Value -> ( Model, Cmd Msg )
 init _ =
-    ( { viewMode = ViewMode.twitter }
+    ( { viewMode = ViewMode.flag__web }
     , Cmd.none
     )
 
