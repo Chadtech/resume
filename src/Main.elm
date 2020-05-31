@@ -89,11 +89,46 @@ view model =
 
                     ViewMode.Twitter ->
                         twitter
+
+                    ViewMode.ThankYou ->
+                        thankYou
         in
         Style.globals model.viewMode
             :: body
             |> List.map Html.toUnstyled
     }
+
+
+thankYou : List (Html msg)
+thankYou =
+    let
+        greetingNames : List (Html msg)
+        greetingNames =
+            [ "Dear "
+            , String.join ", " []
+            , ", "
+            ]
+                |> String.concat
+                |> textRow [ Style.marginBottom medium ] []
+                |> List.singleton
+
+        body : List (Html msg)
+        body =
+            []
+                |> List.map (textRow [ Style.marginBottom medium ] [])
+
+        signature : List (Html msg)
+        signature =
+            [ textRow [ Style.marginBottom medium ] [] "Best,"
+            , textRow [] [] "-Chad"
+            ]
+    in
+    [ greetingNames
+    , body
+    , signature
+    ]
+        |> List.concat
+        |> solitaryCard
 
 
 twitter : List (Html msg)
@@ -124,6 +159,11 @@ twitter =
                 |> (::)
                     (textRow [ Style.marginTop 3 ] [ Css.color Ct.important0 ] "What I am looking for:")
     in
+    solitaryCard (goodAt ++ lookingFor)
+
+
+solitaryCard : List (Html msg) -> List (Html msg)
+solitaryCard body =
     [ Grid.row
         [ Css.flex (Css.int 1)
         , Css.justifyContent Css.center
@@ -138,7 +178,7 @@ twitter =
                 [ Style.width 9 ]
                 [ Card.body
                     [ Style.padding 3 ]
-                    (goodAt ++ lookingFor)
+                    body
                 ]
             ]
         ]

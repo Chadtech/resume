@@ -1,14 +1,10 @@
 module Data.ViewMode exposing
     ( ViewMode(..)
-    , decoder
     , flag__pdf
     , flag__web
+    , thankYou
     , twitter
     )
-
-import Json.Decode as Decode exposing (Decoder)
-
-
 
 --------------------------------------------------------------------------------
 -- TYPES --
@@ -19,6 +15,7 @@ type ViewMode
     = Pdf
     | Web
     | Twitter
+    | ThankYou
 
 
 
@@ -42,20 +39,6 @@ twitter =
     Twitter
 
 
-decoder : Decoder ViewMode
-decoder =
-    let
-        fromString : String -> Decoder ViewMode
-        fromString str =
-            case str of
-                "pdf" ->
-                    Decode.succeed Pdf
-
-                "web" ->
-                    Decode.succeed Web
-
-                _ ->
-                    Decode.fail ("Unrecognized view mode: " ++ str)
-    in
-    Decode.string
-        |> Decode.andThen fromString
+thankYou : ViewMode
+thankYou =
+    ThankYou
