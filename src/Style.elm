@@ -31,10 +31,10 @@ module Style exposing
     )
 
 import Chadtech.Colors as Ct
-import Css exposing (..)
+import Css
 import Css.Global exposing (global)
 import Data.ViewMode as ViewMode exposing (ViewMode)
-import Html.Styled as Html exposing (Html)
+import Html.Styled exposing (Html)
 
 
 size : Int -> Float
@@ -150,38 +150,46 @@ globals viewMode =
     let
         webModeStyles : Css.Style
         webModeStyles =
+            let
+                openBackgroundColor : Css.Style
+                openBackgroundColor =
+                    Css.backgroundColor Ct.background1
+            in
             case viewMode of
                 ViewMode.Pdf ->
                     [ letterSize
-                    , backgroundColor Ct.background1
+                    , openBackgroundColor
                     ]
                         |> Css.batch
 
                 ViewMode.Web ->
-                    [ backgroundColor Ct.content1
+                    [ Css.backgroundColor Ct.content1
                     , fullHeight
                     ]
                         |> Css.batch
 
                 ViewMode.Twitter ->
-                    backgroundColor Ct.background1
+                    openBackgroundColor
+
+                ViewMode.ThankYou ->
+                    openBackgroundColor
     in
     [ Css.Global.button
         [ hfnss
         , fontSmoothingNone
-        , outline none
+        , Css.outline Css.none
         , minWidth 6
-        , boxSizing borderBox
-        , cursor pointer
+        , Css.boxSizing Css.borderBox
+        , Css.cursor Css.pointer
         , padding 3
         , outdent
-        , backgroundColor Ct.content1
-        , color Ct.content4
-        , hover
-            [ color Ct.content5
+        , Css.backgroundColor Ct.content1
+        , Css.color Ct.content4
+        , Css.hover
+            [ Css.color Ct.content5
             ]
-        , active
-            [ color Ct.content5
+        , Css.active
+            [ Css.color Ct.content5
             , indent
             ]
         ]
@@ -191,10 +199,10 @@ globals viewMode =
         , Css.flexDirection Css.column
         ]
     , Css.Global.everything
-        [ boxSizing borderBox
+        [ Css.boxSizing Css.borderBox
         , Css.margin zero
         , Css.padding zero
-        , color Ct.content4
+        , Css.color Ct.content4
         , fontSmoothingNone
         , hfnss
         ]
@@ -202,26 +210,26 @@ globals viewMode =
         |> global
 
 
-borderNone : Style
+borderNone : Css.Style
 borderNone =
-    property "border" "none"
+    Css.property "border" "none"
 
 
-indent : Style
+indent : Css.Style
 indent =
-    [ borderLeft3 (px 1) solid Ct.content0
-    , borderTop3 (px 1) solid Ct.content0
-    , borderRight3 (px 1) solid Ct.content2
+    [ Css.borderLeft3 (px 1) Css.solid Ct.content0
+    , Css.borderTop3 (px 1) Css.solid Ct.content0
+    , Css.borderRight3 (px 1) Css.solid Ct.content2
     , borderBottom Ct.content2
     ]
         |> Css.batch
 
 
-outdent : Style
+outdent : Css.Style
 outdent =
-    [ borderLeft3 (px 1) solid Ct.content2
-    , borderTop3 (px 1) solid Ct.content2
-    , borderRight3 (px 1) solid Ct.content0
+    [ Css.borderLeft3 (px 1) Css.solid Ct.content2
+    , Css.borderTop3 (px 1) Css.solid Ct.content2
+    , Css.borderRight3 (px 1) Css.solid Ct.content0
     , borderBottom Ct.content0
     ]
         |> Css.batch
@@ -229,12 +237,12 @@ outdent =
 
 borderBottom : Css.Color -> Css.Style
 borderBottom =
-    borderBottom3 (px 1) solid
+    Css.borderBottom3 (px 1) Css.solid
 
 
-hfnss : Style
+hfnss : Css.Style
 hfnss =
-    [ fontFamilies [ "HFNSS" ]
+    [ Css.fontFamilies [ "HFNSS" ]
     , fontSize 5
     ]
         |> Css.batch
@@ -245,11 +253,11 @@ fontSize =
     Css.fontSize << px
 
 
-fontSmoothingNone : Style
+fontSmoothingNone : Css.Style
 fontSmoothingNone =
-    property "-webkit-font-smoothing" "none"
+    Css.property "-webkit-font-smoothing" "none"
 
 
-center : Style
+center : Css.Style
 center =
-    margin2 zero auto
+    Css.margin2 zero Css.auto
