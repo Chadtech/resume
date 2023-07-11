@@ -14,3 +14,10 @@ npm install
 gulp
 ```
 ..then visit `http://localhost:2957/`
+
+
+## Converting to pdf
+```
+https://webtopdf.com/download
+```
+Use the custom settings to have 0 margins on all sides and set pdf to be on 8.5" x 11" paper.

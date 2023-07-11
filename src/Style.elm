@@ -9,6 +9,8 @@ module Style exposing
     , globals
     , height
     , hfnss
+    , importantIndent
+    , importantOutdent
     , indent
     , letterSize
     , letterWidth
@@ -168,11 +170,11 @@ globals viewMode =
                     ]
                         |> Css.batch
 
-                ViewMode.Twitter ->
-                    openBackgroundColor
-
                 ViewMode.ThankYou ->
-                    openBackgroundColor
+                    [ openBackgroundColor
+                    , Css.height <| Css.pct 100
+                    ]
+                        |> Css.batch
     in
     [ Css.Global.button
         [ hfnss
@@ -182,16 +184,6 @@ globals viewMode =
         , Css.boxSizing Css.borderBox
         , Css.cursor Css.pointer
         , padding 3
-        , outdent
-        , Css.backgroundColor Ct.content1
-        , Css.color Ct.content4
-        , Css.hover
-            [ Css.color Ct.content5
-            ]
-        , Css.active
-            [ Css.color Ct.content5
-            , indent
-            ]
         ]
     , Css.Global.body
         [ webModeStyles
@@ -231,6 +223,26 @@ outdent =
     , Css.borderTop3 (px 1) Css.solid Ct.content2
     , Css.borderRight3 (px 1) Css.solid Ct.content0
     , borderBottom Ct.content0
+    ]
+        |> Css.batch
+
+
+importantOutdent : Css.Style
+importantOutdent =
+    [ Css.borderLeft3 (px 1) Css.solid Ct.important2
+    , Css.borderTop3 (px 1) Css.solid Ct.important2
+    , Css.borderRight3 (px 1) Css.solid Ct.important0
+    , borderBottom Ct.important0
+    ]
+        |> Css.batch
+
+
+importantIndent : Css.Style
+importantIndent =
+    [ Css.borderLeft3 (px 1) Css.solid Ct.important0
+    , Css.borderTop3 (px 1) Css.solid Ct.important0
+    , Css.borderRight3 (px 1) Css.solid Ct.important2
+    , borderBottom Ct.important2
     ]
         |> Css.batch
 

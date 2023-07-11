@@ -46,7 +46,7 @@ main =
 
 init : Decode.Value -> ( Model, Cmd Msg )
 init _ =
-    ( { viewMode = ViewMode.flag__web }
+    ( { viewMode = ViewMode.thankYou }
     , Cmd.none
     )
 
@@ -75,20 +75,23 @@ update msg model =
 
 view : Model -> Browser.Document Msg
 view model =
-    { title = "Resume"
+    { title =
+        case model.viewMode of
+            ViewMode.ThankYou ->
+                "Thank you"
+
+            _ ->
+                "Chad Stearns Resume"
     , body =
         let
             body : List (Html Msg)
             body =
                 case model.viewMode of
                     ViewMode.Web ->
-                        webBody
+                        webBody model
 
                     ViewMode.Pdf ->
-                        resume
-
-                    ViewMode.Twitter ->
-                        twitter
+                        resume model
 
                     ViewMode.ThankYou ->
                         thankYou
@@ -102,68 +105,60 @@ view model =
 thankYou : List (Html msg)
 thankYou =
     let
+        gapSize : Int
+        gapSize =
+            large
+
         greetingNames : List (Html msg)
         greetingNames =
             [ "Dear "
-            , String.join ", " []
+            , String.join ", "
+                [ "" ]
             , ", "
             ]
                 |> String.concat
-                |> textRow [ Style.marginBottom medium ] []
+                |> textRow [ Style.marginBottom gapSize ] []
                 |> List.singleton
 
         body : List (Html msg)
         body =
-            []
-                |> List.map (textRow [ Style.marginBottom medium ] [])
+            [ """
+                Paragraph 1
+            """
+            , """
+                Bottom Text
+            """
+            ]
+                |> List.map (textRow [ Style.marginBottom gapSize ] [])
 
         signature : List (Html msg)
         signature =
-            [ textRow [ Style.marginBottom medium ] [] "Best,"
-            , textRow [] [] "-Chad"
+            [ "Thanks again,"
+            , "- Chad"
+            ]
+                |> List.map (textRow [ Style.marginBottom gapSize ] [])
+
+        postscript : List (Html msg)
+        postscript =
+            [ textRow [ Style.marginBottom gapSize ] [] "PS"
+            , textRow []
+                []
+                """
+                """
             ]
     in
     [ greetingNames
     , body
     , signature
+
+    --, postscript
     ]
         |> List.concat
-        |> solitaryCard
+        |> solitaryCard 10
 
 
-twitter : List (Html msg)
-twitter =
-    let
-        row : String -> Html msg
-        row =
-            textRow [ Style.marginTop 3 ] []
-
-        goodAt : List (Html msg)
-        goodAt =
-            [ "- Frontend development, especially large complex architecture"
-            , "- Clean, maintainable, bug free code"
-            , "- Functional programming (Elm, Haskell)"
-            , "- \"Soft skills\", mentoring, sharing ideas, experimenting"
-            , "- Working towards the customer value"
-            ]
-                |> List.map row
-                |> (::)
-                    (textRow [] [ Css.color Ct.important0 ] "What I am good at:")
-
-        lookingFor : List (Html msg)
-        lookingFor =
-            [ "- Full time, preferably remote work"
-            , "- New domains and personal growth, (backend code, lead roles)"
-            ]
-                |> List.map row
-                |> (::)
-                    (textRow [ Style.marginTop 3 ] [ Css.color Ct.important0 ] "What I am looking for:")
-    in
-    solitaryCard (goodAt ++ lookingFor)
-
-
-solitaryCard : List (Html msg) -> List (Html msg)
-solitaryCard body =
+solitaryCard : Int -> List (Html msg) -> List (Html msg)
+solitaryCard width body =
     [ Grid.row
         [ Css.flex (Css.int 1)
         , Css.justifyContent Css.center
@@ -175,7 +170,9 @@ solitaryCard body =
             , Css.justifyContent Css.center
             ]
             [ Card.view
-                [ Style.width 9 ]
+                [ Style.width width
+                , Css.lineHeight (Css.px 23)
+                ]
                 [ Card.body
                     [ Style.padding 3 ]
                     body
@@ -185,8 +182,8 @@ solitaryCard body =
     ]
 
 
-webBody : List (Html Msg)
-webBody =
+webBody : Model -> List (Html Msg)
+webBody model =
     [ Grid.row
         [ Css.flex (Css.int 1)
         , Style.padding (large + 1)
@@ -203,7 +200,7 @@ webBody =
             , Css.flexDirection Css.column
             , Style.indent
             ]
-            resume
+            (resume model)
         ]
     , Grid.row
         [ Style.padding (large + 1)
@@ -216,18 +213,16 @@ webBody =
             , Css.flexBasis Css.initial
             , Css.justifyContent Css.flexEnd
             ]
-            [ Button.config
-                { onClick = DownloadAsPdfClicked
-                , label = "Download as PDF"
-                }
+            [ Button.primary "Download as PDF"
+                |> Button.onClick DownloadAsPdfClicked
                 |> Button.toHtml
             ]
         ]
     ]
 
 
-resume : List (Html msg)
-resume =
+resume : Model -> List (Html msg)
+resume model =
     let
         leftColumn : List (Html msg)
         leftColumn =
@@ -239,12 +234,22 @@ resume =
             ]
                 |> List.concat
 
+        inWebModeOnly : List (Html msg) -> List (Html msg)
+        inWebModeOnly html =
+            if model.viewMode == ViewMode.Pdf then
+                []
+
+            else
+                html
+
         career : List (Html msg)
         career =
-            [ humio
-            , shore
-            , chadtech
-            , localMotors
+            [ structionSite
+            , mackeyRms
+            , humio
+            , inWebModeOnly shore
+            , inWebModeOnly chadtech
+            , inWebModeOnly localMotors
             ]
                 |> List.concat
                 |> (::) (header [] "career")
@@ -261,14 +266,18 @@ resume =
                 |> List.concat
                 |> (::) (header [] "projects")
 
-        resumeGithubLink : Html msg
-        resumeGithubLink =
+        headerLink : String -> String -> Html msg
+        headerLink link text =
             Html.a
-                [ Attrs.href "https://www.github.com/chadtech/resume"
+                [ Attrs.href link
                 , Attrs.css
                     [ Css.color Ct.content0 ]
                 ]
-                [ Html.text "github.com/chadtech/resume" ]
+                [ Html.text text ]
+
+        resumeGithubLink : Html msg
+        resumeGithubLink =
+            headerLink "https://www.github.com/chadtech/resume" "github.com/chadtech/resume"
 
         contact : ( String, String ) -> Html msg
         contact ( method, value ) =
@@ -278,6 +287,17 @@ resume =
                 , Css.whiteSpace Css.noWrap
                 ]
                 (method ++ ": " ++ value)
+
+        resumeLink : List (Html msg)
+        resumeLink =
+            if model.viewMode == ViewMode.Pdf then
+                [ resumeGithubLink
+                , Html.text ","
+                , headerLink "https://chad-stearns-resume.surge.sh/" "view online"
+                ]
+
+            else
+                [ resumeGithubLink ]
 
         name : Html msg
         name =
@@ -290,8 +310,8 @@ resume =
                     [ Css.flexDirection Css.column ]
                     [ textRow
                         []
-                        [ Style.fontSize 6
-                        , Css.color Ct.content0
+                        [ Css.color Ct.content0
+                        , Style.fontSize 6
                         ]
                         "Chad Stearns"
                     , Grid.row
@@ -302,7 +322,7 @@ resume =
                         ]
                         [ Grid.column
                             [ Css.color Ct.content0 ]
-                            [ resumeGithubLink ]
+                            resumeLink
                         ]
                     ]
                 , Grid.column
@@ -344,17 +364,6 @@ resume =
             ]
             career
         ]
-    ]
-
-
-roc : List (Html msg)
-roc =
-    [ projectTitle
-        { name = "<project in stealth mode>"
-        , url = Nothing
-        , description = "a functional programming language that compiles to machine code."
-        }
-    , tech "Rust, LLVM"
     ]
 
 
@@ -402,6 +411,17 @@ projectTitle params =
         ]
 
 
+roc : List (Html msg)
+roc =
+    [ projectTitle
+        { name = "Roc"
+        , url = Just "https://youtu.be/ZnYa99QoznE?t=4766"
+        , description = "a functional programming language that compiles to machine code."
+        }
+    , tech "Rust, Zig, LLVM"
+    ]
+
+
 radler : List (Html msg)
 radler =
     [ projectTitle
@@ -429,7 +449,7 @@ listExtra =
     [ projectTitle
         { name = "elm-community/list-extra"
         , url = Just "https://package.elm-lang.org/packages/elm-community/list-extra/latest/"
-        , description = "list helper functions; one of the most used Elm packages."
+        , description = "list helper functions; one of Elm's the most used packages."
         }
     ]
 
@@ -455,10 +475,45 @@ forbesNashMachine =
     ]
 
 
+structionSite : List (Html msg)
+structionSite =
+    [ jobTitle [] "StructionSite, Lead Software Engineer"
+    , jobDuration "May 2021" "present" (Just "Acquired by DroneDeploy")
+    , tech "Elm, Rust, Postgres, GraphQL"
+    , textRow
+        [ Style.marginTop small ]
+        []
+        """
+        StructionSite serves the largest construction companies by providing them with weekly "google street views"
+        of construction sites so that project managers can remotely track material progress.
+        """
+    , jobDetail "Delivered features for a data intensive application in performance sensitive code"
+    ]
+
+
+mackeyRms : List (Html msg)
+mackeyRms =
+    [ jobTitle [] "MackeyRMS, Principal Software Developer"
+    , jobDuration "Jun 2020" "Apr 2021" (Just "Merged with InsiderScore")
+    , tech "Elm, Haskell"
+    , textRow
+        [ Style.marginTop small ]
+        []
+        """
+        MackeyRMS is a tool for investors to collect, retrieve, and discuss their
+        market research.
+        """
+    , jobDetail
+        """
+        Lead team through delicate overhaul of entire frontend, both in terms of design and code architecture
+        """
+    ]
+
+
 humio : List (Html msg)
 humio =
     [ jobTitle [] "Humio, Senior Software Engineer"
-    , jobDuration "November 2018" "April 2020"
+    , jobDuration "Nov 2018" "Apr 2020" (Just "Acquired by CrowdStrike")
     , tech "Elm, Scala, GraphQL"
     , textRow
         [ Style.marginTop small ]
@@ -481,7 +536,7 @@ jobTitle extraStyles =
     let
         color : Css.Color
         color =
-            Ct.important1
+            Ct.important5
     in
     textRow
         [ Style.borderBottom color
@@ -492,7 +547,7 @@ jobTitle extraStyles =
 shore : List (Html msg)
 shore =
     [ jobTitle [ Style.marginTop large ] "Shore GmbH, Senior Software Developer"
-    , jobDuration "August 2017" "November 2018"
+    , jobDuration "Aug 2017" "Nov 2018" Nothing
     , tech "Elm, JavaScript, React, TypeScript"
     , textRow
         [ Style.marginTop small ]
@@ -508,7 +563,7 @@ shore =
 chadtech : List (Html msg)
 chadtech =
     [ jobTitle [ Style.marginTop large ] "Chadtech Co, CEO"
-    , jobDuration "October 2013" "present"
+    , jobDuration "Oct 2013" "present" Nothing
     , tech "Hardware, Elm, JavaScript, React, Go, C++"
     , textRow
         [ Style.marginTop small ]
@@ -522,7 +577,7 @@ chadtech =
 localMotors : List (Html msg)
 localMotors =
     [ jobTitle [ Style.marginTop large ] "Local Motors, Lab Manager"
-    , jobDuration "February 2015" "Sept 2015"
+    , jobDuration "Feb 2015" "Sep 2015" Nothing
     , tech "3D printing, CAD, CNC machining, Electronics, JavaScript, React"
     , textRow
         [ Style.marginTop small ]
@@ -557,12 +612,20 @@ tech techItems =
         ]
 
 
-jobDuration : String -> String -> Html msg
-jobDuration from to =
+jobDuration : String -> String -> Maybe String -> Html msg
+jobDuration from to extra =
     textRow
         [ Style.marginTop small ]
         [ Css.color Ct.content3 ]
-        (String.join " " [ from, "-", to ])
+        (String.join " "
+            [ from
+            , "-"
+            , to
+            , extra
+                |> Maybe.map (\str -> "| " ++ str)
+                |> Maybe.withDefault ""
+            ]
+        )
 
 
 jobDetail : String -> Html msg
@@ -615,7 +678,15 @@ talks =
                     params.year
                 ]
     in
-    [ { name = "Elm Europe"
+    [ { name = "\"HashMaps\""
+      , url = Just "https://www.youtube.com/watch?v=mJFoGR1w28Q"
+      , year = "2022"
+      }
+    , { name = "Elm Online Meetup"
+      , url = Just "https://youtu.be/XlJuICG2kFU"
+      , year = "2021"
+      }
+    , { name = "Elm Europe"
       , url = Just "https://www.youtube.com/watch?v=RFCPAw5C5hQ"
       , year = "2019"
       }
@@ -760,7 +831,7 @@ header : List Css.Style -> String -> Html msg
 header extraStyles text =
     textRow
         extraStyles
-        [ Css.color Ct.important0 ]
+        [ Css.color Ct.important4 ]
         text
 
 

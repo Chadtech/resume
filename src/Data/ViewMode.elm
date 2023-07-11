@@ -3,7 +3,6 @@ module Data.ViewMode exposing
     , flag__pdf
     , flag__web
     , thankYou
-    , twitter
     )
 
 --------------------------------------------------------------------------------
@@ -14,7 +13,6 @@ module Data.ViewMode exposing
 type ViewMode
     = Pdf
     | Web
-    | Twitter
     | ThankYou
 
 
@@ -32,11 +30,6 @@ flag__pdf =
 flag__web : ViewMode
 flag__web =
     Web
-
-
-twitter : ViewMode
-twitter =
-    Twitter
 
 
 thankYou : ViewMode

@@ -3,25 +3,21 @@
   "version": "1.0.0",
   "description": "resume",
   "main": "gulpFile.js",
-  "dependencies": {
-    "body-parser": "^1.18.3",
-    "browserify": "^16.1.1",
-    "express": "^4.16.3",
-    "gulp": "^3.9.1",
-    "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^2.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "minimist": ">=1.2.3",
-    "kind-of": ">=6.0.3",
-    "set-value": ">=2.0.1",
-    "lodash.template": ">=4.5.0",
-    "lodash": ">=4.17.12"
+    "elm": "^0.19.1-5",
+    "elm-test": "^0.19.1-revision7",
+    "express": "^4.17.3",
+    "gulp": "^4.0.2",
+    "gulp-elm": "^0.8.2"
   },
   "scripts": {
-    "start": "gulp",
-    "build-pdf": "sed -i \\\"\\\" 's/flag__web/flag__pdf/g' ./src/Main.elm && gulp build",
-    "build": "sed -i \\\"\\\" 's/flag__pdf/flag__web/g' ./src/Main.elm && gulp build"
+    "test": "./node_modules/.bin/elm-test",
+    "dev": "./node_modules/gulp/bin/gulp.js dev",
+    "build": "sed -i \\\"\\\" 's/flag__pdf/flag__web/g' ./src/Main.elm && ./node_modules/gulp/bin/gulp.js buildProd",
+    "build-pdf": "sed -i \\\"\\\" 's/flag__web/flag__pdf/g' ./src/Main.elm && ./node_modules/gulp/bin/gulp.js buildProd",
+    "deploy": "npm run build && surge /Users/ct/code/resume/public chad-stearns-resume.surge.sh",
+    "deploy-pdf": "npm run build-pdf && surge /Users/ct/code/resume/public chad-stearns-resume-pdf.surge.sh"
   },
   "author": "Chadtech",
   "license": "ISC"
