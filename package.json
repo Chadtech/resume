@@ -8,7 +8,7 @@
     "elm": "^0.19.1-5",
     "elm-test": "^0.19.1-revision7",
     "express": "^4.17.3",
-    "gulp": "^4.0.2",
+    "gulp": "^5.0.0",
     "gulp-elm": "^0.8.2"
   },
   "scripts": {
