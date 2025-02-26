@@ -12,10 +12,10 @@
     "gulp-elm": "^0.8.2"
   },
   "scripts": {
-    "test": "./node_modules/.bin/elm-test",
-    "dev": "./node_modules/gulp/bin/gulp.js dev",
-    "build": "sed -i \\\"\\\" 's/flag__pdf/flag__web/g' ./src/Main.elm && ./node_modules/gulp/bin/gulp.js buildProd",
-    "build-pdf": "sed -i \\\"\\\" 's/flag__web/flag__pdf/g' ./src/Main.elm && ./node_modules/gulp/bin/gulp.js buildProd",
+    "test": "../node_modules/.bin/elm-test",
+    "dev": "../node_modules/gulp/bin/gulp.js dev",
+    "build": "sed -i \\\"\\\" 's/flag__pdf/flag__web/g' src/Main.elm && ./node_modules/gulp/bin/gulp.js buildProd",
+    "build-pdf": "sed -i \\\"\\\" 's/flag__web/flag__pdf/g' src/Main.elm && ./node_modules/gulp/bin/gulp.js buildProd",
     "deploy": "npm run build && surge /Users/ct/code/resume/public chad-stearns-resume.surge.sh",
     "deploy-pdf": "npm run build-pdf && surge /Users/ct/code/resume/public chad-stearns-resume-pdf.surge.sh"
   },

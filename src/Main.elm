@@ -1,886 +1,1268 @@
-port module Main exposing (main)
+port module Main exposing (..)
 
-import Browser exposing (UrlRequest)
-import Chadtech.Colors as Ct
+import Browser exposing (Document)
 import Css
-import Data.ViewMode as ViewMode exposing (ViewMode)
-import Html.Grid as Grid
+import Css.Global
+import Ext.Html as H
+import Html as Unstyled
 import Html.Styled as Html exposing (Html)
-import Html.Styled.Attributes as Attrs
-import Json.Decode as Decode
-import Json.Encode as Encode
-import Style
+import Html.Styled.Attributes as Attr
+import Json.Decode as JD
+import Style as S
 import View.Button as Button
-import View.Card as Card
+import ViewFormat
+
+
+port downloadPdf : () -> Cmd msg
 
 
 
---------------------------------------------------------------------------------
+----------------------------------------------------------------
 -- TYPES --
---------------------------------------------------------------------------------
+----------------------------------------------------------------
 
 
 type alias Model =
-    { viewMode : ViewMode }
+    {}
 
 
 type Msg
-    = DownloadAsPdfClicked
+    = ClickeDownloadAsPdf
+
+
+type Project
+    = Roc
+    | Radler
+    | CtPaint
+    | ListExtra
+    | ElmCanvas
+    | Himesama
+    | Orbiter13
+    | SolafideForbesNashMachine
+
+
+type Job
+    = SuperFocus
+    | StructionSite
+    | MackeyRMS
+    | Humio
+    | Shore
+    | LocalMotors
+    | Chadtech
+
+
+type Talk
+    = HashMaps
+    | ElmOnlineMeetup
+    | ElmEurope
+    | MunichFrontend
+    | DesertCodeCamp
+    | QueensJs
+    | X29C3
+
+
+type Meetups
+    = RustPhilaDelphia
+    | ElmMunich
+    | ElmNYC
+    | CoffeeAndCode
+    | PhxReactJS
+    | NodeAZ
+
+
+type Award
+    = ArduinoWearables
+    | HtmlGameHackathon
 
 
 
---------------------------------------------------------------------------------
--- MAIN --
---------------------------------------------------------------------------------
+----------------------------------------------------------------
+-- INIT --
+----------------------------------------------------------------
 
 
-main : Program Decode.Value Model Msg
-main =
-    { init = init
-    , view = view
-    , update = update
-    , subscriptions = \_ -> Sub.none
-    }
-        |> Browser.document
+type alias Flags =
+    {}
 
 
-init : Decode.Value -> ( Model, Cmd Msg )
+flagsDecoder : JD.Decoder Flags
+flagsDecoder =
+    JD.succeed {}
+
+
+init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( { viewMode = ViewMode.thankYou }
-    , Cmd.none
-    )
+    ( Model, Cmd.none )
 
 
 
---------------------------------------------------------------------------------
+----------------------------------------------------------------
+-- HELPERS --
+----------------------------------------------------------------
+
+
+allTalks : List Talk
+allTalks =
+    [ HashMaps
+    , ElmOnlineMeetup
+    , ElmEurope
+    , MunichFrontend
+    , DesertCodeCamp
+    , QueensJs
+    , X29C3
+    ]
+
+
+allMeetups : List Meetups
+allMeetups =
+    [ RustPhilaDelphia
+    , ElmMunich
+    , ElmNYC
+    , CoffeeAndCode
+    , PhxReactJS
+    , NodeAZ
+    ]
+
+
+allAwards : List Award
+allAwards =
+    [ ArduinoWearables
+    , HtmlGameHackathon
+    ]
+
+
+allProjects : List Project
+allProjects =
+    [ Roc
+    , Radler
+    , CtPaint
+    , ListExtra
+    , Orbiter13
+    , ElmCanvas
+    , Himesama
+    , SolafideForbesNashMachine
+    ]
+
+
+allJobs : List Job
+allJobs =
+    [ SuperFocus
+    , StructionSite
+    , MackeyRMS
+    , Humio
+    , Shore
+    , LocalMotors
+    , Chadtech
+    ]
+
+
+
+----------------------------------------------------------------
 -- UPDATE --
---------------------------------------------------------------------------------
+----------------------------------------------------------------
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        DownloadAsPdfClicked ->
-            ( model
-            , downloadAsPdf
-                { url = "http://chad-stearns-resume.surge.sh/chad_stearns_resume.pdf" }
-            )
+        ClickeDownloadAsPdf ->
+            ( model, downloadPdf () )
 
 
 
---------------------------------------------------------------------------------
+----------------------------------------------------------------
 -- VIEW --
---------------------------------------------------------------------------------
+----------------------------------------------------------------
 
 
-view : Model -> Browser.Document Msg
-view model =
-    { title =
-        case model.viewMode of
-            ViewMode.ThankYou ->
-                "Thank you"
-
-            _ ->
-                "Chad Stearns Resume"
-    , body =
-        let
-            body : List (Html Msg)
-            body =
-                case model.viewMode of
-                    ViewMode.Web ->
-                        webBody model
-
-                    ViewMode.Pdf ->
-                        resume model
-
-                    ViewMode.ThankYou ->
-                        thankYou
-        in
-        Style.globals model.viewMode
-            :: body
-            |> List.map Html.toUnstyled
-    }
-
-
-thankYou : List (Html msg)
-thankYou =
-    let
-        gapSize : Int
-        gapSize =
-            large
-
-        greetingNames : List (Html msg)
-        greetingNames =
-            [ "Dear "
-            , String.join ", "
-                [ "" ]
-            , ", "
-            ]
-                |> String.concat
-                |> textRow [ Style.marginBottom gapSize ] []
-                |> List.singleton
-
-        body : List (Html msg)
-        body =
-            [ """
-                Paragraph 1
-            """
-            , """
-                Bottom Text
-            """
-            ]
-                |> List.map (textRow [ Style.marginBottom gapSize ] [])
-
-        signature : List (Html msg)
-        signature =
-            [ "Thanks again,"
-            , "- Chad"
-            ]
-                |> List.map (textRow [ Style.marginBottom gapSize ] [])
-
-        postscript : List (Html msg)
-        postscript =
-            [ textRow [ Style.marginBottom gapSize ] [] "PS"
-            , textRow []
-                []
-                """
-                """
-            ]
-    in
-    [ greetingNames
-    , body
-    , signature
-
-    --, postscript
-    ]
-        |> List.concat
-        |> solitaryCard 10
-
-
-solitaryCard : Int -> List (Html msg) -> List (Html msg)
-solitaryCard width body =
-    [ Grid.row
-        [ Css.flex (Css.int 1)
-        , Css.justifyContent Css.center
-        , Style.fullWidth
-        ]
-        [ Grid.column
-            [ Css.flex (Css.int 0)
-            , Css.flexDirection Css.column
-            , Css.justifyContent Css.center
-            ]
-            [ Card.view
-                [ Style.width width
-                , Css.lineHeight (Css.px 23)
-                ]
-                [ Card.body
-                    [ Style.padding 3 ]
-                    body
-                ]
-            ]
-        ]
-    ]
-
-
-webBody : Model -> List (Html Msg)
-webBody model =
-    [ Grid.row
-        [ Css.flex (Css.int 1)
-        , Style.padding (large + 1)
-        , Style.paddingBottom medium
-        , Css.justifyContent Css.center
-        , Css.minHeight (Css.px 0)
-        ]
-        [ Grid.column
-            [ Style.letterWidth
-            , Css.flex (Css.int 0)
-            , Css.flexBasis Css.initial
-            , Css.backgroundColor Ct.background1
-            , Css.overflow Css.auto
-            , Css.flexDirection Css.column
-            , Style.indent
-            ]
-            (resume model)
-        ]
-    , Grid.row
-        [ Style.padding (large + 1)
-        , Style.paddingTop medium
-        , Css.justifyContent Css.center
-        ]
-        [ Grid.column
-            [ Style.letterWidth
-            , Css.flex (Css.int 0)
-            , Css.flexBasis Css.initial
-            , Css.justifyContent Css.flexEnd
-            ]
-            [ Button.primary "Download as PDF"
-                |> Button.onClick DownloadAsPdfClicked
-                |> Button.toHtml
-            ]
-        ]
-    ]
-
-
-resume : Model -> List (Html msg)
-resume model =
-    let
-        leftColumn : List (Html msg)
-        leftColumn =
-            [ talks
-            , meetUps
-            , awards
-            , volunteer
-            , education
-            ]
-                |> List.concat
-
-        inWebModeOnly : List (Html msg) -> List (Html msg)
-        inWebModeOnly html =
-            if model.viewMode == ViewMode.Pdf then
-                []
-
-            else
-                html
-
-        career : List (Html msg)
-        career =
-            [ structionSite
-            , mackeyRms
-            , humio
-            , inWebModeOnly shore
-            , inWebModeOnly chadtech
-            , inWebModeOnly localMotors
-            ]
-                |> List.concat
-                |> (::) (header [] "career")
-
-        projects : List (Html msg)
-        projects =
-            [ roc
-            , radler
-            , ctPaint
-            , listExtra
-            , elmCanvas
-            , forbesNashMachine
-            ]
-                |> List.concat
-                |> (::) (header [] "projects")
-
-        headerLink : String -> String -> Html msg
-        headerLink link text =
-            Html.a
-                [ Attrs.href link
-                , Attrs.css
-                    [ Css.color Ct.content0 ]
-                ]
-                [ Html.text text ]
-
-        resumeGithubLink : Html msg
-        resumeGithubLink =
-            headerLink "https://www.github.com/chadtech/resume" "github.com/chadtech/resume"
-
-        contact : ( String, String ) -> Html msg
-        contact ( method, value ) =
-            textRow
-                [ Style.paddingBottom 1 ]
-                [ Css.color Ct.content0
-                , Css.whiteSpace Css.noWrap
-                ]
-                (method ++ ": " ++ value)
-
-        resumeLink : List (Html msg)
-        resumeLink =
-            if model.viewMode == ViewMode.Pdf then
-                [ resumeGithubLink
-                , Html.text ","
-                , headerLink "https://chad-stearns-resume.surge.sh/" "view online"
-                ]
-
-            else
-                [ resumeGithubLink ]
-
-        name : Html msg
-        name =
-            Grid.row
-                [ Style.padding small
-                , Css.backgroundColor Ct.content4
-                , safariBugFix
-                ]
-                [ Grid.column
-                    [ Css.flexDirection Css.column ]
-                    [ textRow
-                        []
-                        [ Css.color Ct.content0
-                        , Style.fontSize 6
+view : Model -> List (Html Msg)
+view _ =
+    globalStyles
+        :: (case ViewFormat.viewFormat of
+                ViewFormat.Web ->
+                    [ H.row
+                        [ S.minH0
+                        , Css.property "flex" "1 1 100%"
+                        , S.justifyCenter
                         ]
-                        "Chad Stearns"
-                    , Grid.row
-                        [ Style.padding small
-                        , Css.paddingTop Style.zero
-                        , Css.backgroundColor Ct.content4
-                        , safariBugFix
+                        [ H.col
+                            [ letterWidth
+                            , S.bgNightwood1
+                            , S.overflowAuto
+                            , S.indent
+                            , S.g2
+                            ]
+                            resume
                         ]
-                        [ Grid.column
-                            [ Css.color Ct.content0 ]
-                            resumeLink
-                        ]
-                    ]
-                , Grid.column
-                    [ Css.flexDirection Css.column
-                    , Css.flex (Css.int 0)
-                    ]
-                    (List.map contact
-                        [ ( "phone", "+1 480 450 6514" )
-                        , ( "email", "chadtech0@gmail.com" )
-                        ]
-                    )
-                ]
-    in
-    [ name
-    , Grid.row
-        [ Style.padding small
-        , Css.borderBottom3 (Style.px 1) Css.solid Ct.content4
-        , safariBugFix
-        ]
-        [ Grid.column
-            [ Css.flexDirection Css.column ]
-            projects
-        ]
-    , Grid.row
-        [ Css.flex (Css.int 1)
-        , safariBugFix
-        ]
-        [ Grid.column
-            [ Css.flex (Css.int 0)
-            , Css.flexBasis Css.initial
-            , Css.borderRight3 (Style.px 1) Css.solid Ct.content4
-            , Css.flexDirection Css.column
-            , Style.padding small
-            ]
-            leftColumn
-        , Grid.column
-            [ Style.padding small
-            , Css.flexDirection Css.column
-            ]
-            career
-        ]
-    ]
-
-
-projectTitle :
-    { name : String
-    , url : Maybe String
-    , description : String
-    }
-    -> Html msg
-projectTitle params =
-    let
-        textColor : Css.Style
-        textColor =
-            Css.color Ct.content4
-
-        nameView : Html msg
-        nameView =
-            case params.url of
-                Just url ->
-                    Html.a
-                        [ Attrs.css [ textColor ]
-                        , Attrs.href url
-                        ]
-                        [ Html.text params.name ]
-
-                Nothing ->
-                    Html.span
-                        [ Attrs.css
-                            [ textColor
-                            , Css.whiteSpace Css.noWrap
+                    , H.row
+                        [ S.justifyCenter ]
+                        [ H.row
+                            [ letterWidth
+                            , S.justifyEnd
+                            ]
+                            [ Button.primary "Download as PDF"
+                                |> Button.onClick ClickeDownloadAsPdf
+                                |> Button.toHtml
                             ]
                         ]
-                        [ Html.text params.name ]
-    in
-    Grid.row
-        [ Style.marginTop small ]
-        [ Grid.column
-            []
-            [ Html.span
-                []
-                [ nameView
-                , Html.text (", " ++ params.description)
-                ]
-            ]
+                    ]
+
+                ViewFormat.Pdf ->
+                    resume
+           )
+
+
+resume : List (Html Msg)
+resume =
+    [ nameAndInfo
+    , H.col
+        [ S.px2
+        , S.pb2
+        , S.g2
+        ]
+        [ jobs
+        , projects
+        , talks
+        , awards
+        , educationAndVolunteering
+        ]
+    ]
+
+
+educationAndVolunteering : Html Msg
+educationAndVolunteering =
+    H.row
+        [ S.g2
+        ]
+        [ education, volunteering ]
+
+
+education : Html Msg
+education =
+    H.col
+        [ S.textGray4
+        , S.flex1
+        ]
+        [ H.row
+            [ S.textYellow4 ]
+            [ H.s "education" ]
+        , H.row [ S.textGray5 ] [ H.s "Arizona State University" ]
+        , H.row [] [ H.s "Bachelor of Science in Economics" ]
+        , H.row [] [ H.s "Graduated 2013" ]
         ]
 
 
-roc : List (Html msg)
-roc =
-    [ projectTitle
-        { name = "Roc"
-        , url = Just "https://youtu.be/ZnYa99QoznE?t=4766"
-        , description = "a functional programming language that compiles to machine code."
-        }
-    , tech "Rust, Zig, LLVM"
-    ]
-
-
-radler : List (Html msg)
-radler =
-    [ projectTitle
-        { name = "Radler"
-        , url = Just "https://github.com/Chadtech/Radler-ui"
-        , description = "a music composition and audio generation application."
-        }
-    , tech "Haskell, Elm, Electron"
-    ]
-
-
-ctPaint : List (Html msg)
-ctPaint =
-    [ projectTitle
-        { name = "CtPaint"
-        , url = Just "https://www.ctpaint.org/app"
-        , description = "pixel art sofware in the browser."
-        }
-    , tech "Elm, AWS Lambda"
-    ]
-
-
-listExtra : List (Html msg)
-listExtra =
-    [ projectTitle
-        { name = "elm-community/list-extra"
-        , url = Just "https://package.elm-lang.org/packages/elm-community/list-extra/latest/"
-        , description = "list helper functions; one of Elm's the most used packages."
-        }
-    ]
-
-
-elmCanvas : List (Html msg)
-elmCanvas =
-    [ projectTitle
-        { name = "elm-canvas"
-        , url = Just "https://github.com/Elm-Canvas/elm-canvas"
-        , description = "html canvas in the Elm programming language."
-        }
-    ]
-
-
-forbesNashMachine : List (Html msg)
-forbesNashMachine =
-    [ projectTitle
-        { name = "Solafide Forbes Nash Machine"
-        , url = Just "https://hackaday.com/2014/05/20/the-solafide-forbes-nash-organ/"
-        , description = "48 key analog synthesizer."
-        }
-    , tech "Electronics"
-    ]
-
-
-structionSite : List (Html msg)
-structionSite =
-    [ jobTitle [] "StructionSite, Lead Software Engineer"
-    , jobDuration "May 2021" "present" (Just "Acquired by DroneDeploy")
-    , tech "Elm, Rust, Postgres, GraphQL"
-    , textRow
-        [ Style.marginTop small ]
-        []
-        """
-        StructionSite serves the largest construction companies by providing them with weekly "google street views"
-        of construction sites so that project managers can remotely track material progress.
-        """
-    , jobDetail "Delivered features for a data intensive application in performance sensitive code"
-    ]
-
-
-mackeyRms : List (Html msg)
-mackeyRms =
-    [ jobTitle [] "MackeyRMS, Principal Software Developer"
-    , jobDuration "Jun 2020" "Apr 2021" (Just "Merged with InsiderScore")
-    , tech "Elm, Haskell"
-    , textRow
-        [ Style.marginTop small ]
-        []
-        """
-        MackeyRMS is a tool for investors to collect, retrieve, and discuss their
-        market research.
-        """
-    , jobDetail
-        """
-        Lead team through delicate overhaul of entire frontend, both in terms of design and code architecture
-        """
-    ]
-
-
-humio : List (Html msg)
-humio =
-    [ jobTitle [] "Humio, Senior Software Engineer"
-    , jobDuration "Nov 2018" "Apr 2020" (Just "Acquired by CrowdStrike")
-    , tech "Elm, Scala, GraphQL"
-    , textRow
-        [ Style.marginTop small ]
-        []
-        """
-        Humio provides high performance data querying to large enterprise customers (Bloomberg, Netlify).
-        On a 25 node system, Humio can query 2.2 million events per second and ingest 100 TB of data a day.
-        """
-    , jobDetail
-        "Responsible for key functionality such as complex infinite scrolling and plugin system."
-    , jobDetail
-        "Exemplified team standard for code review and pull request descriptions."
-    , jobDetail
-        "Designed and implemented broad architecture of large front end code base."
-    ]
-
-
-jobTitle : List Css.Style -> String -> Html msg
-jobTitle extraStyles =
-    let
-        color : Css.Color
-        color =
-            Ct.important5
-    in
-    textRow
-        [ Style.borderBottom color
+volunteering : Html Msg
+volunteering =
+    H.col
+        [ S.textGray4
+        , S.flex1
         ]
-        (Css.color color :: extraStyles)
-
-
-shore : List (Html msg)
-shore =
-    [ jobTitle [ Style.marginTop large ] "Shore GmbH, Senior Software Developer"
-    , jobDuration "Aug 2017" "Nov 2018" Nothing
-    , tech "Elm, JavaScript, React, TypeScript"
-    , textRow
-        [ Style.marginTop small ]
-        []
-        "Shore is scheduling and appointment software for small businesses and their customers."
-    , jobDetail
-        "Created core appointment application that was served to thousands of users."
-    , jobDetail
-        "Maintained large calendar user interface and skeleton \"app shell\" architecture."
-    ]
-
-
-chadtech : List (Html msg)
-chadtech =
-    [ jobTitle [ Style.marginTop large ] "Chadtech Co, CEO"
-    , jobDuration "Oct 2013" "present" Nothing
-    , tech "Hardware, Elm, JavaScript, React, Go, C++"
-    , textRow
-        [ Style.marginTop small ]
-        []
-        "My consulting business entity. My primary service was front end client work for start ups."
-    , jobDetail "Ran ambitious kickstarter for own software product."
-    , jobDetail "Wrote high performance audio processing code for immersive video online car reports."
-    ]
-
-
-localMotors : List (Html msg)
-localMotors =
-    [ jobTitle [ Style.marginTop large ] "Local Motors, Lab Manager"
-    , jobDuration "Feb 2015" "Sep 2015" Nothing
-    , tech "3D printing, CAD, CNC machining, Electronics, JavaScript, React"
-    , textRow
-        [ Style.marginTop small ]
-        []
-        "Local Motors is an experimental car manufacturer that pioneered crowd sourced engineering and made the world's first 3D printed car."
-    , jobDetail
-        "Built electronic and computer components for automotive engineering initiatives."
-    , jobDetail
-        "Taught classes on CNC milling and 3D Printing."
-    , jobDetail
-        "Ambassador to local community and governance."
-    ]
-
-
-tech : String -> Html msg
-tech techItems =
-    Grid.row
-        [ Style.marginTop small
-        , Css.flexBasis Css.auto
-        , Css.flexShrink (Css.int 0)
-        ]
-        [ textColumn
-            [ Style.marginRight large
-            , Css.flex Css.initial
-            , Css.color Ct.content3
-            ]
-            "tech:"
-        , textColumn
-            [ Css.color Ct.problem1
-            ]
-            techItems
+        [ H.row
+            [ S.textYellow4 ]
+            [ H.s "volunteering" ]
+        , H.row [ S.textGray5 ] [ H.s "HeatSync Labs, 501(c)(3) non-profit" ]
+        , H.row [] [ H.s "Treasurer and active member" ]
+        , H.row [] [ H.s "2012 to 2014" ]
         ]
 
 
-jobDuration : String -> String -> Maybe String -> Html msg
-jobDuration from to extra =
-    textRow
-        [ Style.marginTop small ]
-        [ Css.color Ct.content3 ]
-        (String.join " "
-            [ from
-            , "-"
-            , to
-            , extra
-                |> Maybe.map (\str -> "| " ++ str)
-                |> Maybe.withDefault ""
-            ]
+awards : Html Msg
+awards =
+    H.col
+        []
+        (H.row
+            [ S.textYellow4 ]
+            [ H.s "awards" ]
+            :: List.map awardView allAwards
         )
 
 
-jobDetail : String -> Html msg
-jobDetail content =
-    textRow
-        [ Style.marginTop small ]
-        [ Css.color Ct.content4 ]
-        ("- " ++ content)
+awardView : Award -> Html Msg
+awardView award =
+    let
+        name : String
+        name =
+            case award of
+                ArduinoWearables ->
+                    "Arduino Wearables"
+
+                HtmlGameHackathon ->
+                    "HTML5 Game"
+
+        year : String
+        year =
+            case award of
+                ArduinoWearables ->
+                    "2014"
+
+                HtmlGameHackathon ->
+                    "2012"
+
+        url : String
+        url =
+            case award of
+                ArduinoWearables ->
+                    "https://imgur.com/QfDKg7P"
+
+                HtmlGameHackathon ->
+                    "https://hackphx.com/html5games_winter2012/"
+    in
+    H.col
+        []
+        [ H.row
+            [ S.justifySpaceBetween
+            , S.textGray4
+            ]
+            [ Html.div
+                []
+                [ H.s "Winner of jury prize at "
+                , Html.a
+                    [ Attr.href url ]
+                    [ H.s name ]
+                , H.s " hackathon"
+                ]
+            , H.s year
+            ]
+        ]
 
 
-talks : List (Html msg)
+jobs : Html Msg
+jobs =
+    H.col
+        [ S.g2
+        ]
+        (H.row
+            [ S.textYellow4 ]
+            [ H.s "jobs" ]
+            :: List.map jobView allJobs
+        )
+
+
+jobView : Job -> Html Msg
+jobView job =
+    let
+        name : String
+        name =
+            case job of
+                SuperFocus ->
+                    "SuperFocus.ai"
+
+                StructionSite ->
+                    "StructionSite"
+
+                MackeyRMS ->
+                    "MackeyRMS"
+
+                Humio ->
+                    "Humio"
+
+                Shore ->
+                    "Shore"
+
+                LocalMotors ->
+                    "LocalMotors"
+
+                Chadtech ->
+                    "Chadtech"
+
+        role : String
+        role =
+            case job of
+                SuperFocus ->
+                    "Senior Software Engineer"
+
+                StructionSite ->
+                    "Lead Software Engineer"
+
+                MackeyRMS ->
+                    "Principal Software Engineer"
+
+                Humio ->
+                    "Senior Software Engineer"
+
+                Shore ->
+                    "Senior Software Engineer"
+
+                LocalMotors ->
+                    "Lab Manager"
+
+                Chadtech ->
+                    "Programming Freelancer"
+
+        acquisition : Maybe String
+        acquisition =
+            case job of
+                SuperFocus ->
+                    Nothing
+
+                StructionSite ->
+                    Just "DroneDeploy"
+
+                MackeyRMS ->
+                    Just "InsiderScore"
+
+                Humio ->
+                    Just "CrowdStrike"
+
+                Shore ->
+                    Nothing
+
+                LocalMotors ->
+                    Nothing
+
+                Chadtech ->
+                    Nothing
+
+        acquisitionStr : String
+        acquisitionStr =
+            case acquisition of
+                Just acquiringCompany ->
+                    let
+                        acquisitionText : String
+                        acquisitionText =
+                            if job == MackeyRMS then
+                                "merged with "
+
+                            else
+                                "acquired by "
+
+                        partyPopperEmoji : Char
+                        partyPopperEmoji =
+                            Char.fromCode 0x0001F389
+                    in
+                    String.concat
+                        [ ", "
+                        , acquisitionText
+                        , acquiringCompany
+                        , " "
+                        , String.fromChar partyPopperEmoji
+                        ]
+
+                Nothing ->
+                    ""
+
+        startDate : String
+        startDate =
+            case job of
+                SuperFocus ->
+                    "July 2023"
+
+                StructionSite ->
+                    "May 2021"
+
+                MackeyRMS ->
+                    "June 2022"
+
+                Humio ->
+                    "November 2018"
+
+                Shore ->
+                    "August 2017"
+
+                LocalMotors ->
+                    "February 2015"
+
+                Chadtech ->
+                    "October 2013"
+
+        endDate : String
+        endDate =
+            case job of
+                SuperFocus ->
+                    "present"
+
+                StructionSite ->
+                    "July 2023"
+
+                MackeyRMS ->
+                    "April 2021"
+
+                Humio ->
+                    "April 2020"
+
+                Shore ->
+                    "November 2018"
+
+                LocalMotors ->
+                    "September 2015"
+
+                Chadtech ->
+                    "July 2017"
+
+        timeFrameStr : String
+        timeFrameStr =
+            startDate ++ " to " ++ endDate
+
+        jobTech : List String
+        jobTech =
+            case job of
+                SuperFocus ->
+                    [ "Elm"
+                    , "Rust"
+                    , "Python"
+                    , "LLMs"
+                    , "Voice AI"
+                    , "GRPC"
+                    , "Axum"
+                    , "TypeScript"
+                    , "Next.js"
+                    , "React"
+                    , "Postgres"
+                    , "Websockets"
+                    , "Tailwind"
+                    , "Sqlx"
+                    ]
+
+                StructionSite ->
+                    [ "Rust"
+                    , "Elm"
+                    , "WASM"
+                    , "Bevy"
+                    , "GraphQL"
+                    , "React"
+                    , "Warp"
+                    , "Postgres"
+                    , "Tailwind"
+                    , "Sqlx"
+                    ]
+
+                MackeyRMS ->
+                    [ "Elm"
+                    , "Haskell"
+                    , "JavaScript"
+                    , "Angular"
+                    , "Servant"
+                    , "Web Components"
+                    ]
+
+                Humio ->
+                    [ "Elm"
+                    , "Scala"
+                    , "GraphQL"
+                    , "Highcharts"
+                    , "Web Components"
+                    ]
+
+                Shore ->
+                    [ "Elm"
+                    , "TypeScript"
+                    , "React"
+                    , "Algolia"
+                    , "Web Components"
+                    ]
+
+                LocalMotors ->
+                    [ "React"
+                    , "JavaScript"
+                    , "CAD"
+                    , "CNC Water Jet"
+                    , "Electronics"
+                    , "FireBase"
+                    ]
+
+                Chadtech ->
+                    [ "Elm"
+                    , "React"
+                    , "Hardware"
+                    , "Go"
+                    , "C++"
+                    ]
+
+        description : String
+        description =
+            case job of
+                SuperFocus ->
+                    """SuperFocus makes superhuman AI
+customer service agents, by solving the LLM hallucination problem, ensuring
+reliability and accuracy"""
+
+                StructionSite ->
+                    """StructionSite served the largest construction
+companies by providing them with ML powered weekly "google street views" of
+construction sites so that project managers can remotely track material progress."""
+
+                MackeyRMS ->
+                    "MackeyRMS is a tool for investors to collect, retrieve, and discuss their market research."
+
+                Humio ->
+                    """Humio provides high performance data querying to large enterprise customers.
+                    On a 25 node system, Humio can query 2.2m events per second and ingest 100TB of data a day."""
+
+                Shore ->
+                    "Shore provides scheduling and appointment software for small businesses and their customers."
+
+                LocalMotors ->
+                    "Local Motors was an experimental car manufacturer that pioneered crowd sourced engineering and made the world's first 3D printed car"
+
+                Chadtech ->
+                    "Consultancy for various clients, including programming, hardware, and graphic design."
+
+        bulletPoints : List String
+        bulletPoints =
+            case job of
+                SuperFocus ->
+                    [ """Consolidated ~10 independent AI codebases into a single database-configurable
+application, streamlining the deployment and development of AI agents.
+                    """
+                    , """With my team, we recognized the need for flexibility in our AI agent development. I
+lead the research and prototyping of a system that allowed dynamic rearrangement of core AI components, somewhat like how a programming language works.
+                     """
+                    , """Acted as a liaison between management and the engineering team, proactively coordinating
+the efforts of individual developers. Fostering trust and ensuring project clarity through communication and understanding."""
+                    ]
+
+                StructionSite ->
+                    [ """Actively contributed to the development of a data-intensive construction project tracking system.
+Along with my team, we utilized techniques such as asynchronous task queues, event sourcing, and the
+architecture of a video game engine.
+                    """
+                    , """Ran our weekly sprint meetings, collaborating closely with the product and design teams, and worked
+closely with engineers to ensure our team had a good mutual understanding of the project, and that we stayed on track.
+                     """
+                    ]
+
+                MackeyRMS ->
+                    [ "Lead team through delicate overhaul of entire frontend, both in terms of design and code architecture." ]
+
+                Humio ->
+                    [ """Engineered through small iterative pieces, an advanced infinite scroll system, for time-based and
+                    unbounded data by dynamically measuring irregularly sized DOM elements to accurately adjust scroll position. This system was bi-directional, and could
+focus on specific elements despite a continuous high volume flow of data."""
+                    , """Set the standards for code reviews by consistently providing clear and detailed pull requests,
+that were recognized by leadership, elevating our code review process.
+                             """
+                    , """Designed and implemented broad architecture of large frontend code base, through 
+research, discussion, and experimentation."""
+                    ]
+
+                Shore ->
+                    [ """Took full ownership of implementing core frontend application for customers to edit and create appointments."""
+                    , """Maintained and fixed bugs for a large calendar user interface and skeleton "App Shell" architecture,
+                    that loaded and ran smaller frontend applications in designated slots in the page layout."""
+                    , """Mentored fellow engineers in Elm programming, guiding team members towards adopting best practices
+                    through code review, pairing sessions, and hosting Elm workshops."""
+                    ]
+
+                LocalMotors ->
+                    [ """Taught regular classes on CNC milling and 3D printing, enabling members from the general public to visit
+                    and use our machinery."""
+                    , """Leveraged my years of makerspace experience to enhance lab operations and foster a creative productive environment."""
+                    , """Ran tech events almost nightly, building a network of makers and engineers."""
+                    ]
+
+                Chadtech ->
+                    [ """For Carvana, a website for buying and selling used cars, I wrote high performance audio processing
+                    code as part of a larger project of generating immersive online video car reports."""
+                    , """For an early stage Fintech startup, I made a authenticated frontend application with custom RSA encryption that
+                    depicts stock and investment options in a network graph."""
+                    ]
+
+        bulletPointView : String -> Html msg
+        bulletPointView bulletPoint =
+            H.row
+                [ descriptionColor ]
+                [ H.s <| "- " ++ bulletPoint ]
+    in
+    H.col
+        []
+        [ H.row
+            [ S.justifySpaceBetween ]
+            [ H.row
+                [ S.textYellow5 ]
+                [ H.s name ]
+            , H.row
+                [ S.textYellow5 ]
+                [ H.s role ]
+            ]
+        , H.row
+            [ S.g2
+            , S.textGray3
+            ]
+            [ H.s <| timeFrameStr ++ acquisitionStr
+            ]
+        , Html.div
+            [ Attr.css [ techColor ] ]
+            [ Html.span
+                [ Attr.css [ S.textGray4 ] ]
+                [ H.s "tech: " ]
+            , H.s <| String.join ", " jobTech
+            ]
+        , H.row
+            [ descriptionColor
+            ]
+            [ H.s description ]
+        , H.col
+            []
+            (List.map bulletPointView bulletPoints)
+        ]
+
+
+descriptionColor : Css.Style
+descriptionColor =
+    S.textGray5
+
+
+techColor : Css.Style
+techColor =
+    S.textRed1
+
+
+talks : Html Msg
 talks =
-    let
-        link : String -> String -> Html msg
-        link name url =
-            Html.a
-                [ Attrs.href url ]
-                [ Html.text name ]
+    H.col
+        [ S.g2
+        ]
+        (H.row
+            [ S.textYellow4 ]
+            [ H.s "talks" ]
+            :: List.map talkView allTalks
+        )
 
-        row :
-            { name : String
-            , url : Maybe String
-            , year : String
-            }
-            -> Html msg
-        row params =
+
+talkView : Talk -> Html Msg
+talkView talk =
+    let
+        title : String
+        title =
+            case talk of
+                HashMaps ->
+                    "Hash Maps"
+
+                ElmOnlineMeetup ->
+                    "Analytics and Architecture in Elm"
+
+                ElmEurope ->
+                    "What has excited me about Audio Synthesis Theory"
+
+                MunichFrontend ->
+                    "Using Elm at Shore"
+
+                DesertCodeCamp ->
+                    "How React works under the hood"
+
+                QueensJs ->
+                    "CtPaint"
+
+                X29C3 ->
+                    "Lightning Talk on Audio Synthesizer"
+
+        maybeEvent : Maybe String
+        maybeEvent =
+            case talk of
+                HashMaps ->
+                    Nothing
+
+                ElmOnlineMeetup ->
+                    Just "Elm Online Meetup"
+
+                ElmEurope ->
+                    Just "Elm Europe"
+
+                MunichFrontend ->
+                    Just "Munich Frontend"
+
+                DesertCodeCamp ->
+                    Just "Desert Code Camp"
+
+                QueensJs ->
+                    Just "QueensJs"
+
+                X29C3 ->
+                    Just "29C3"
+
+        maybeUrl : Maybe String
+        maybeUrl =
+            case talk of
+                HashMaps ->
+                    Just "https://www.youtube.com/watch?v=mJFoGR1w28Q"
+
+                ElmOnlineMeetup ->
+                    Just "https://youtu.be/XlJuICG2kFU"
+
+                ElmEurope ->
+                    Just "https://www.youtube.com/watch?v=RFCPAw5C5hQ"
+
+                MunichFrontend ->
+                    Nothing
+
+                DesertCodeCamp ->
+                    Just "https://youtu.be/e6jzkoGeDEs"
+
+                QueensJs ->
+                    Nothing
+
+                X29C3 ->
+                    Nothing
+
+        year : String
+        year =
+            case talk of
+                HashMaps ->
+                    "2022"
+
+                ElmOnlineMeetup ->
+                    "2021"
+
+                ElmEurope ->
+                    "2019"
+
+                MunichFrontend ->
+                    "2018"
+
+                DesertCodeCamp ->
+                    "2016"
+
+                QueensJs ->
+                    "2016"
+
+                X29C3 ->
+                    "2012"
+
+        titleView : Html Msg
+        titleView =
             let
-                name : Html msg
-                name =
-                    case params.url of
-                        Just url ->
-                            link params.name url
-
-                        Nothing ->
-                            Html.text params.name
+                withQuotes : String
+                withQuotes =
+                    "\"" ++ title ++ "\""
             in
-            Grid.row
-                [ Style.marginTop small
-                , safariBugFix
-                ]
-                [ Grid.column
-                    [ Css.flex (Css.int 0)
-                    , Style.noWrap
-                    ]
-                    [ name ]
-                , textColumn
-                    [ Css.color Ct.content3
-                    , Css.justifyContent Css.flexEnd
-                    ]
-                    params.year
-                ]
+            case maybeUrl of
+                Just url ->
+                    Html.a
+                        [ Attr.href url ]
+                        [ H.s withQuotes ]
+
+                Nothing ->
+                    H.s withQuotes
+
+        eventView : Html Msg
+        eventView =
+            case maybeEvent of
+                Just event ->
+                    H.s <| " at " ++ event
+
+                Nothing ->
+                    H.s ""
+
+        maybeSummary : Maybe String
+        maybeSummary =
+            case talk of
+                HashMaps ->
+                    Just """How Hashmaps work, as well as summarizing what
+                    I learned working on Roc's HashMap"""
+
+                ElmOnlineMeetup ->
+                    Just """In this talk I detail how I do frontend analytics
+                    in Elm, utilizing some tricks in Elm's type system to remind developers where they need to
+                    make changes."""
+
+                ElmEurope ->
+                    Just """I demonstrate how to synthesize various instrument sounds in terms of the theories of
+                    additive synthesis and granular synthesis."""
+
+                MunichFrontend ->
+                    Just """Shore's frontend lead engineer and I summarized what our experience has been
+                    with Elm."""
+
+                DesertCodeCamp ->
+                    Just """My audience and I make React from scratch through incremental and small steps."""
+
+                QueensJs ->
+                    Nothing
+
+                X29C3 ->
+                    Nothing
+
+        summaryView : Html Msg
+        summaryView =
+            case maybeSummary of
+                Just summary ->
+                    H.row
+                        [ descriptionColor ]
+                        [ H.s summary ]
+
+                Nothing ->
+                    H.s ""
     in
-    [ { name = "\"HashMaps\""
-      , url = Just "https://www.youtube.com/watch?v=mJFoGR1w28Q"
-      , year = "2022"
-      }
-    , { name = "Elm Online Meetup"
-      , url = Just "https://youtu.be/XlJuICG2kFU"
-      , year = "2021"
-      }
-    , { name = "Elm Europe"
-      , url = Just "https://www.youtube.com/watch?v=RFCPAw5C5hQ"
-      , year = "2019"
-      }
-    , { name = "Munich Frontend"
-      , url = Nothing
-      , year = "2018"
-      }
-    , { name = "Desert Code Camp"
-      , url = Just "https://youtu.be/e6jzkoGeDEs"
-      , year = "2016"
-      }
-    , { name = "QueensJS", url = Nothing, year = "2016" }
-    , { name = "29C3", url = Nothing, year = "2012" }
-    ]
-        |> List.map row
-        |> (::) (header [] "talks")
+    H.col
+        [ S.textGray4 ]
+        [ H.row
+            [ S.justifySpaceBetween ]
+            [ Html.div
+                []
+                [ titleView
+                , eventView
+                ]
+            , H.row [] [ H.s year ]
+            ]
+        , summaryView
+        ]
 
 
-awards : List (Html msg)
-awards =
+projects : Html Msg
+projects =
+    H.col
+        [ S.g2
+        ]
+        (H.row
+            [ S.textYellow4 ]
+            [ H.s "projects" ]
+            :: List.map projectView allProjects
+        )
+
+
+projectView : Project -> Html Msg
+projectView project =
     let
-        award :
-            { name : String
-            , year : String
-            , url : Maybe String
+        projectName : String
+        projectName =
+            case project of
+                Roc ->
+                    "Roc"
+
+                Radler ->
+                    "Radler"
+
+                CtPaint ->
+                    "CtPaint"
+
+                ListExtra ->
+                    "elm-community/list-extra"
+
+                ElmCanvas ->
+                    "elm-canvas"
+
+                Himesama ->
+                    "Himesama"
+
+                Orbiter13 ->
+                    "Orbiter13"
+
+                SolafideForbesNashMachine ->
+                    "Solafide Forbes Nash Machine"
+
+        url : String
+        url =
+            case project of
+                Roc ->
+                    "https://www.roc-lang.org/"
+
+                Radler ->
+                    "https://github.com/Chadtech/Radler-ui"
+
+                CtPaint ->
+                    "https://ctpaint.org/app"
+
+                ListExtra ->
+                    "https://package.elm-lang.org/packages/elm-community/list-extra/latest/"
+
+                ElmCanvas ->
+                    "https://github.com/Elm-Canvas/elm-canvas"
+
+                Himesama ->
+                    "https://github.com/Chadtech/Himesama"
+
+                Orbiter13 ->
+                    "https://www.chadtech.us/orbiter-13/"
+
+                SolafideForbesNashMachine ->
+                    "https://hackaday.com/2014/05/20/the-solafide-forbes-nash-organ/"
+
+        description : String
+        description =
+            case project of
+                Roc ->
+                    """For my weekends from 2019 to 2021, I was
+contributing to the Roc programming language. My biggest
+undertakings were (1) writing a large majority of the Roc code formatter, which
+takes an abstract syntax tree,
+and converts it into textual code, (2) writing the first implementation of the
+core List functions compilation down to LLVM machine code, (3) designing
+Roc's HashMaps, and (4) making the code that generates html files rendering Roc
+module documentation.
+"""
+
+                Radler ->
+                    """I made Radler myself to make music with. The user
+interface is for writing a musical score, and the backend generates audio of the music
+and efficiently updates the audio as the user makes changes to the musical score."""
+
+                CtPaint ->
+                    """In 2016 I ran an (unsuccessful) kickstarter campaign for online
+pixel art software. I made the software anyway, with not only the complete
+functionality of drawing images, but also connectivity features to import any image from
+the web, and tiered access granting bonus features like uploading images."""
+
+                ListExtra ->
+                    """List.Extra is one of the most downloaded Elm packages. It provides helper functions for
+                    working with lists. Most of my impact on this project is not so much writing code,
+but refereeing submissions from others. I make sure every submission
+is truly useful, and implemented in a performant way. Every major version
+update risks disrupting the wider Elm community, and every
+contribution risks confusing developers if not carefully thought through."""
+
+                ElmCanvas ->
+                    """To make CtPaint (listed above), I needed to use HTML Canvas. Elm Canvas
+                    is a library that
+brings the canvas HTML element into Elm, and provides an api for drawing on HTML canvases through JavaScript FFI.
+The main challenge was how to use the mutable
+canvas element in an immutable functional programming language.
+"""
+
+                Himesama ->
+                    """A reimplementation of React from scratch with my own attempt
+at state management. Incidentally, Himesama has a much smaller bundle size than React, which
+is a significant performance bottleneck for many large React projects.
+                    """
+
+                Orbiter13 ->
+                    "A difficult videogame based on orbital mechanics."
+
+                SolafideForbesNashMachine ->
+                    """To explore my interest in unusual music tuning systems,
+I designed and built 3 audio synthesizers. With help, I designed a sine wave oscillator
+circuit, etched 48 of these oscillators onto circuit boards, and then put them into
+wooden enclosures I designed and laser cut."""
+
+        tech : List String
+        tech =
+            case project of
+                Roc ->
+                    [ "Rust", "Zig", "LLVM" ]
+
+                Radler ->
+                    [ "Haskell", "Elm", "Electron" ]
+
+                CtPaint ->
+                    [ "Elm", "Html Canvas", "Node", "AWS Lambda" ]
+
+                ListExtra ->
+                    [ "Elm" ]
+
+                ElmCanvas ->
+                    [ "Elm, JavaScript", "Html Canvas" ]
+
+                Himesama ->
+                    [ "CoffeeScript" ]
+
+                Orbiter13 ->
+                    [ "Elm", "CoffeeScript", "Express" ]
+
+                SolafideForbesNashMachine ->
+                    [ "Circuitry", "Laser Cutting" ]
+    in
+    H.col
+        [ S.textGray4 ]
+        [ H.row
+            [ S.justifySpaceBetween ]
+            [ Html.a
+                [ Attr.href url ]
+                [ H.s projectName ]
+            , H.row
+                [ techColor ]
+                [ H.s <| String.join ", " tech ]
+            ]
+        , H.row
+            [ descriptionColor ]
+            [ H.s description ]
+        ]
+
+
+nameAndInfo : Html Msg
+nameAndInfo =
+    H.row
+        [ S.bgGray4
+        , S.textGray0
+        , S.p2
+        , S.g4
+        ]
+        [ chadStearnsName
+        , resumeLinks
+        , contactInfo
+        ]
+
+
+chadStearnsName : Html Msg
+chadStearnsName =
+    H.col
+        [ Css.fontFamilies [ "HFNSS" ]
+        , Css.fontSize <| Css.rem 4
+        , Css.property "-webkit-font-smoothing" "none"
+        , S.pre
+        ]
+        [ H.s "Chad Stearns" ]
+
+
+resumeLinks : Html Msg
+resumeLinks =
+    H.col
+        []
+        [ Html.a
+            [ Attr.href "https://www.github.com/chadtech/resume" ]
+            [ H.s "github.com/chadtech/resume" ]
+        , Html.a
+            [ Attr.href "https://chad-stearns-resume.surge.sh" ]
+            [ H.s "View this resume online" ]
+        ]
+
+
+contactInfo : Html Msg
+contactInfo =
+    H.col
+        [ S.pre ]
+        [ H.row
+            []
+            [ H.s "phone: +1 480 450 6514" ]
+        , H.row
+            []
+            [ H.s "email: chadtech0@gmail.com" ]
+        ]
+
+
+letterWidth : Css.Style
+letterWidth =
+    Css.width (Css.px 850)
+
+
+globalStyles : Html Msg
+globalStyles =
+    let
+        bg : Css.Style
+        bg =
+            case ViewFormat.viewFormat of
+                ViewFormat.Web ->
+                    S.bgGray1
+
+                ViewFormat.Pdf ->
+                    S.bgNightwood1
+
+        viewFormatStyles : List Css.Style
+        viewFormatStyles =
+            case ViewFormat.viewFormat of
+                ViewFormat.Web ->
+                    [ S.p4
+                    ]
+
+                ViewFormat.Pdf ->
+                    [ Css.width (Css.px 850)
+                    , S.g2
+                    ]
+    in
+    Css.Global.global
+        [ Css.Global.everything
+            [ Css.boxSizing Css.borderBox ]
+        , Css.Global.html
+            [ bg ]
+        , Css.Global.body
+            [ S.batch viewFormatStyles
+            , Css.fontFamilies
+                [ "'JetBrains Mono'"
+                , "inter"
+                , "monospace"
+                , "sans-serif"
+                ]
+            , S.col
+            , S.m0
+            , bg
+            , S.g2
+            , S.hFull
+            ]
+        , Css.Global.a
+            [ S.textBlue0
+            ]
+        ]
+
+
+
+----------------------------------------------------------------
+-- SUBSCRIPTIONS --
+----------------------------------------------------------------
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.none
+
+
+
+----------------------------------------------------------------
+-- MAIN --
+----------------------------------------------------------------
+
+
+type State
+    = State__Loaded Model
+    | State__Failed JD.Error
+
+
+main : Program JD.Value State Msg
+main =
+    let
+        init_ : JD.Value -> ( State, Cmd Msg )
+        init_ json =
+            case JD.decodeValue flagsDecoder json of
+                Ok flags ->
+                    let
+                        ( model, cmd ) =
+                            init flags
+
+                        state : State
+                        state =
+                            State__Loaded model
+                    in
+                    ( state
+                    , cmd
+                    )
+
+                Err err ->
+                    ( State__Failed err
+                    , Cmd.none
+                    )
+
+        update_ : Msg -> State -> ( State, Cmd Msg )
+        update_ msg state =
+            case state of
+                State__Loaded model ->
+                    let
+                        ( newModel, cmd ) =
+                            update msg model
+
+                        newState : State
+                        newState =
+                            State__Loaded newModel
+                    in
+                    ( newState
+                    , cmd
+                    )
+
+                State__Failed _ ->
+                    ( state, Cmd.none )
+
+        view_ : State -> Document Msg
+        view_ state =
+            { body =
+                case state of
+                    State__Loaded model ->
+                        view model
+                            |> List.map Html.toUnstyled
+
+                    State__Failed error ->
+                        [ Unstyled.text (JD.errorToString error) ]
+            , title = "Chad Stearns Resume"
             }
-            -> Html msg
-        award params =
-            let
-                name : Html msg
-                name =
-                    case params.url of
-                        Just url ->
-                            Html.a
-                                [ Attrs.href url ]
-                                [ Html.text params.name ]
 
-                        Nothing ->
-                            Html.text params.name
-            in
-            Grid.row
-                [ Style.marginTop small
-                , safariBugFix
-                ]
-                [ Grid.column [] [ name ]
-                , textColumn
-                    [ Css.color Ct.content3
-                    , Css.flex (Css.int 0)
-                    ]
-                    params.year
-                ]
+        subscriptions_ : State -> Sub Msg
+        subscriptions_ state =
+            case state of
+                State__Loaded model ->
+                    subscriptions model
+
+                State__Failed _ ->
+                    Sub.none
     in
-    [ { name = "Arduino Wearables"
-      , year = "2014"
-      , url = Just "https://imgur.com/QfDKg7P"
-      }
-    , { name = "Html Game Hackathon"
-      , year = "2012"
-      , url = Nothing
-      }
-    ]
-        |> List.map award
-        |> (::) (header [ Style.marginTop medium ] "awards")
-
-
-volunteer : List (Html msg)
-volunteer =
-    let
-        row : ( Css.Color, String ) -> Html msg
-        row ( color, text ) =
-            textRow
-                [ Style.marginTop small ]
-                [ Css.color color
-                , Style.width 0
-                ]
-                text
-
-        detailsRow : String -> Html msg
-        detailsRow text =
-            row ( Ct.content3, text )
-    in
-    [ header [ Style.marginTop medium ] "volunteering"
-    , row ( Ct.content4, "HeatSync Labs" )
-    , detailsRow "May 2012 - April 2014"
-    , detailsRow "501(c)3 non-profit"
-    , detailsRow "treasurer"
-    , detailsRow "~$30k in annual revenue"
-    ]
-
-
-meetUps : List (Html msg)
-meetUps =
-    let
-        nameAndRole : String -> String -> Html msg
-        nameAndRole name role =
-            Grid.row
-                [ Style.marginTop small
-                , safariBugFix
-                ]
-                [ textColumn
-                    [ Css.flex (Css.int 0)
-                    , Style.noWrap
-                    ]
-                    name
-                , textColumn
-                    [ Css.color Ct.content3
-                    , Css.justifyContent Css.flexEnd
-                    ]
-                    role
-                ]
-    in
-    [ header [ Style.marginTop medium ] "meet ups"
-    , nameAndRole "Rust Philadelphia" ""
-    , nameAndRole "Elm |> Munich" "organizer"
-    , nameAndRole "Elm NYC" "regular speaker"
-    , nameAndRole "Coffee & Code" "host"
-    , nameAndRole "Phx ReactJS" "organizer"
-    , nameAndRole "LM Labs" "organizer"
-    , nameAndRole "NodeAZ" "regular speaker"
-    ]
-
-
-education : List (Html msg)
-education =
-    let
-        row : ( Css.Color, String ) -> Html msg
-        row ( color, text ) =
-            textRow
-                [ Style.marginTop small ]
-                [ Css.color color ]
-                text
-    in
-    [ ( Ct.content4, "B.S. Economics" )
-    , ( Ct.content3, "Arizona State University" )
-    , ( Ct.content3, "Dec 2013" )
-    ]
-        |> List.map row
-        |> (::) (header [ Style.marginTop medium ] "education")
-
-
-header : List Css.Style -> String -> Html msg
-header extraStyles text =
-    textRow
-        extraStyles
-        [ Css.color Ct.important4 ]
-        text
-
-
-textColumn : List Css.Style -> String -> Grid.Column msg
-textColumn styles text =
-    Grid.column styles [ Html.text text ]
-
-
-textRow : List Css.Style -> List Css.Style -> String -> Html msg
-textRow rowStyles columnStyles text =
-    Grid.row
-        (safariBugFix :: rowStyles)
-        [ textColumn columnStyles text ]
-
-
-safariBugFix : Css.Style
-safariBugFix =
-    [ Css.flexBasis Css.auto
-    , Css.flexShrink (Css.int 0)
-    ]
-        |> Css.batch
-
-
-small : Int
-small =
-    2
-
-
-medium : Int
-medium =
-    3
-
-
-large : Int
-large =
-    4
-
-
-
---------------------------------------------------------------------------------
--- Ports --
---------------------------------------------------------------------------------
-
-
-downloadAsPdf : { url : String } -> Cmd msg
-downloadAsPdf params =
-    Encode.object
-        [ ( "url", Encode.string params.url ) ]
-        |> downloadAsPdfInternal
-
-
-port downloadAsPdfInternal : Encode.Value -> Cmd msg
+    Browser.document
+        { init = init_
+        , update = update_
+        , subscriptions = subscriptions_
+        , view = view_
+        }

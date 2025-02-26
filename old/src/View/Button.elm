@@ -5,6 +5,7 @@ module View.Button exposing
     , toHtml
     )
 
+import Chadtech.Colors as Ct
 import Css
 import Html.Styled as Html
     exposing
@@ -12,7 +13,7 @@ import Html.Styled as Html
         , Html
         )
 import Html.Styled.Attributes as Attr
-import Style as S
+import Style
 import Svg.Styled.Events as Event
 
 
@@ -87,36 +88,33 @@ toHtml button =
                 variantStyles =
                     case button.variant of
                         Variant__Primary ->
-                            [ S.bgYellow1
-                            , S.textYellow4
-                            , S.importantOutdent
+                            [ Css.backgroundColor Ct.important1
+                            , Css.color Ct.important4
+                            , Style.importantOutdent
                             , Css.hover
-                                [ S.textYellow5
+                                [ Css.color Ct.important5
                                 ]
                             , Css.active
-                                [ S.textYellow5
-                                , S.importantIndent
+                                [ Css.color Ct.important5
+                                , Style.importantIndent
                                 ]
                             ]
 
                         Variant__Secondary ->
-                            [ S.bgGray1
-                            , S.textGray4
-                            , S.outdent
+                            [ Css.backgroundColor Ct.content1
+                            , Css.color Ct.content4
+                            , Style.outdent
                             , Css.hover
-                                [ S.textGray5
+                                [ Css.color Ct.content5
                                 ]
                             , Css.active
-                                [ S.textGray5
-                                , S.indent
+                                [ Css.color Ct.content5
+                                , Style.indent
                                 ]
                             ]
             in
             [ Attr.css
-                [ S.p2
-                , S.pointerCursor
-                , S.batch variantStyles
-                ]
+                variantStyles
             ]
     in
     Html.button
