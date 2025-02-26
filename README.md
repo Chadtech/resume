@@ -23,5 +23,4 @@ https://www.web2pdfconvert.com/
 ```
 
 Use the custom settings to have 0 margins on all sides and set pdf to be on 8.5" x 11" paper with a view port of 850 by
-
-1100.
+g1100.
