@@ -14,6 +14,7 @@ module ViewFormat exposing
 type ViewFormat
     = Web
     | Pdf
+    | ThankYou { recipient : String, message : String }
 
 
 viewFormat : ViewFormat

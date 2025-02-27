@@ -14,6 +14,8 @@ enum Cmd {
     Dev,
     DeployPdf,
     DeployWebsite,
+    DevThankYou { recipient: String },
+    DeployThankYou { recipient: String, suffix: String },
 }
 
 const VIEW_FORMAT_MODULE: &str = r#"module ViewFormat exposing
@@ -32,6 +34,7 @@ const VIEW_FORMAT_MODULE: &str = r#"module ViewFormat exposing
 type ViewFormat
     = Web
     | Pdf
+    | ThankYou { recipient : String, message : String }
 
 
 viewFormat : ViewFormat
@@ -42,6 +45,7 @@ viewFormat =
 enum ViewFormat {
     Web,
     Pdf,
+    ThankYou { recipient: String, message: String },
 }
 
 #[actix_web::main]
@@ -58,56 +62,43 @@ async fn main() -> Result<(), String> {
 
             generate_view_format_file(ViewFormat::Web)?;
 
-            let r = HttpServer::new(|| App::new().service(html).service(elm_js))
-                .bind(("127.0.0.1", 1754))
-                .map_err(|err| err.to_string())?
-                .run()
-                .await
-                .map_err(|err| err.to_string())?;
-
-            Ok(r)
+            run_server().await
         }
-        Cmd::DeployPdf => {
-            generate_view_format_file(ViewFormat::Pdf)?;
+        Cmd::DeployPdf => deploy(
+            ViewFormat::Pdf,
+            "chad-stearns-resume-pdf.surge.sh".to_string(),
+        ),
+        Cmd::DeployWebsite => deploy(ViewFormat::Web, "chad-stearns-resume.surge.sh".to_string()),
+        Cmd::DevThankYou { recipient } => {
+            let msg = get_thank_you_message()?;
 
-            Command::new("elm")
-                .args(["make", "./src/Main.elm", "--output=./public/elm.js"])
-                .spawn()
-                .map_err(|err| err.to_string())?
-                .wait()
-                .map_err(|err| err.to_string())?;
+            generate_view_format_file(ViewFormat::ThankYou {
+                recipient,
+                message: msg,
+            })?;
 
-            put_index_in_public()?;
+            std::thread::spawn(|| {
+                if let Err(err) = compile_elm_and_file_watch() {
+                    println!("{}", err);
+                };
+            });
 
-            Command::new("surge")
-                .args(["./public", "chad-stearns-resume-pdf.surge.sh"])
-                .spawn()
-                .map_err(|err| err.to_string())?
-                .wait()
-                .map_err(|err| err.to_string())?;
-
-            Ok(())
+            run_server().await
         }
-        Cmd::DeployWebsite => {
-            generate_view_format_file(ViewFormat::Web)?;
+        Cmd::DeployThankYou { recipient, suffix } => {
+            let msg = get_thank_you_message()?;
 
-            Command::new("elm")
-                .args(["make", "./src/Main.elm", "--output=./public/elm.js"])
-                .spawn()
-                .map_err(|err| err.to_string())?
-                .wait()
-                .map_err(|err| err.to_string())?;
+            let mut domain = "chad-stearns-thank-you-".to_string();
+            domain.push_str(suffix.as_str());
+            domain.push_str(".surge.sh");
 
-            put_index_in_public()?;
-
-            Command::new("surge")
-                .args(["./public", "chad-stearns-resume.surge.sh"])
-                .spawn()
-                .map_err(|err| err.to_string())?
-                .wait()
-                .map_err(|err| err.to_string())?;
-
-            Ok(())
+            deploy(
+                ViewFormat::ThankYou {
+                    recipient,
+                    message: msg,
+                },
+                domain,
+            )
         }
     }
 }
@@ -125,6 +116,44 @@ async fn elm_js() -> impl Responder {
     }
 }
 
+async fn run_server() -> Result<(), String> {
+    let r = HttpServer::new(|| App::new().service(html).service(elm_js))
+        .bind(("127.0.0.1", 1754))
+        .map_err(|err| err.to_string())?
+        .run()
+        .await
+        .map_err(|err| err.to_string())?;
+
+    Ok(r)
+}
+
+fn get_thank_you_message() -> Result<String, String> {
+    let thank_you_file_name = "thank_you.txt";
+    std::fs::read_to_string(thank_you_file_name).map_err(|err| err.to_string())
+}
+
+fn deploy(view_format: ViewFormat, domain: String) -> Result<(), String> {
+    generate_view_format_file(view_format)?;
+
+    Command::new("elm")
+        .args(["make", "./src/Main.elm", "--output=./public/elm.js"])
+        .spawn()
+        .map_err(|err| err.to_string())?
+        .wait()
+        .map_err(|err| err.to_string())?;
+
+    put_index_in_public()?;
+
+    Command::new("surge")
+        .args(["./public", domain.as_str()])
+        .spawn()
+        .map_err(|err| err.to_string())?
+        .wait()
+        .map_err(|err| err.to_string())?;
+
+    Ok(())
+}
+
 fn put_index_in_public() -> Result<(), String> {
     std::fs::copy("./src/index.html", "./public/index.html")
         .map_err(|err| err.to_string())
@@ -132,12 +161,21 @@ fn put_index_in_public() -> Result<(), String> {
 }
 
 fn generate_view_format_file(view_format: ViewFormat) -> Result<(), String> {
-    let view_format_str = match view_format {
-        ViewFormat::Web => "Web",
-        ViewFormat::Pdf => "Pdf",
+    let view_format_str: String = match view_format {
+        ViewFormat::Web => "Web".to_string(),
+        ViewFormat::Pdf => "Pdf".to_string(),
+        ViewFormat::ThankYou { recipient, message } => {
+            let mut buf = "ThankYou { recipient = \"".to_string();
+            buf.push_str(recipient.as_str());
+            buf.push_str("\", message = \"\"\"");
+            buf.push_str(message.as_str());
+            buf.push_str("\"\"\" }");
+
+            buf
+        }
     };
 
-    let content = VIEW_FORMAT_MODULE.replace("${view_format}", view_format_str);
+    let content = VIEW_FORMAT_MODULE.replace("${view_format}", view_format_str.as_str());
 
     std::fs::write("./src/ViewFormat.elm", content).map_err(|err| err.to_string())
 }

@@ -209,7 +209,63 @@ view _ =
 
                 ViewFormat.Pdf ->
                     resume
+
+                ViewFormat.ThankYou record ->
+                    thankYou record
            )
+
+
+thankYou : { recipient : String, message : String } -> List (Html Msg)
+thankYou args =
+    let
+        greeting : List (Html Msg)
+        greeting =
+            [ H.row
+                [ S.textGray4
+                ]
+                [ H.s <| "Dear " ++ args.recipient ++ "," ]
+            ]
+
+        messageView : String -> Html Msg
+        messageView message =
+            H.row
+                [ S.textGray4
+                ]
+                [ H.s message ]
+
+        signature : List (Html Msg)
+        signature =
+            [ H.col
+                []
+                [ H.row
+                    [ S.textGray4
+                    ]
+                    [ H.s "Best," ]
+                , H.row
+                    [ S.textGray4
+                    ]
+                    [ H.s "Chad Stearns" ]
+                ]
+            ]
+    in
+    [ H.col
+        [ S.border
+        , S.bgGray1
+        , S.outdent
+        , S.w196
+        , S.justifyCenter
+        , S.p4
+        , S.g4
+        ]
+        (List.concat
+            [ greeting
+            , args.message
+                |> String.split "\n\n"
+                |> List.map messageView
+            , signature
+            ]
+        )
+    ]
 
 
 resume : List (Html Msg)
@@ -1136,6 +1192,9 @@ globalStyles =
                 ViewFormat.Pdf ->
                     S.bgNightwood1
 
+                ViewFormat.ThankYou _ ->
+                    S.bgNightwood1
+
         viewFormatStyles : List Css.Style
         viewFormatStyles =
             case ViewFormat.viewFormat of
@@ -1146,6 +1205,11 @@ globalStyles =
                 ViewFormat.Pdf ->
                     [ Css.width (Css.px 850)
                     , S.g2
+                    ]
+
+                ViewFormat.ThankYou record ->
+                    [ S.justifyCenter
+                    , S.itemsCenter
                     ]
     in
     Css.Global.global
