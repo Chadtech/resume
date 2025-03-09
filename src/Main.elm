@@ -661,8 +661,7 @@ construction sites so that project managers can remotely track material progress
                     [ """Consolidated ~10 independent AI codebases into a single database-configurable
 application, streamlining the deployment and development of AI agents.
                     """
-                    , """With my team, we recognized the need for flexibility in our AI agent development. I
-lead the research and prototyping of a system that allowed dynamic rearrangement of core AI components, somewhat like how a programming language works.
+                    , """Lead the research and prototyping of a system that allowed dynamic rearrangement of core AI components, optimizing code reuse and scalability.
                      """
                     , """Acted as a liaison between management and the engineering team, proactively coordinating
 the efforts of individual developers. Fostering trust and ensuring project clarity through communication and understanding."""
@@ -746,6 +745,8 @@ research, discussion, and experimentation."""
             ]
         , H.row
             [ descriptionColor
+            , S.textSm
+            , S.fontItalic
             ]
             [ H.s description ]
         , H.col
@@ -1028,14 +1029,8 @@ projectView project =
         description =
             case project of
                 Roc ->
-                    """For my weekends from 2019 to 2021, I was
-contributing to the Roc programming language. My biggest
-undertakings were (1) writing a large majority of the Roc code formatter, which
-takes an abstract syntax tree,
-and converts it into textual code, (2) writing the first implementation of the
-core List functions compilation down to LLVM machine code, (3) designing
-Roc's HashMaps, and (4) making the code that generates html files rendering Roc
-module documentation.
+                    """During my weekends from 2019 to 2021, I
+contributed to the Roc programming language.
 """
 
                 Radler ->
@@ -1106,6 +1101,40 @@ wooden enclosures I designed and laser cut."""
 
                 SolafideForbesNashMachine ->
                     [ "Circuitry", "Laser Cutting" ]
+
+        bulletPoints : List String
+        bulletPoints =
+            case project of
+                Roc ->
+                    [ """wrote a large majority of the Roc code formatter, which
+                    takes an abstract syntax tree,
+                    and converts it into textual code."""
+                    , """Wrote the first implementation of the
+                    core List functions compilation down to LLVM machine code."""
+                    , """Designed Roc's HashMaps."""
+                    , """Made the code that generates html files rendering Roc
+                    module documentation."""
+                    ]
+
+                _ ->
+                    []
+
+        bulletPointsView : Html msg
+        bulletPointsView =
+            if List.isEmpty bulletPoints then
+                H.s ""
+
+            else
+                let
+                    bulletPointView : String -> Html msg
+                    bulletPointView bulletPoint =
+                        H.row
+                            [ descriptionColor ]
+                            [ H.s <| "- " ++ bulletPoint ]
+                in
+                H.col
+                    []
+                    (List.map bulletPointView bulletPoints)
     in
     H.col
         [ S.textGray4 ]
@@ -1114,13 +1143,21 @@ wooden enclosures I designed and laser cut."""
             [ Html.a
                 [ Attr.href url ]
                 [ H.s projectName ]
-            , H.row
-                [ techColor ]
-                [ H.s <| String.join ", " tech ]
+            ]
+        , Html.div
+            [ Attr.css [ techColor ] ]
+            [ Html.span
+                [ Attr.css [ S.textGray4 ] ]
+                [ H.s "tech: " ]
+            , H.s <| String.join ", " tech
             ]
         , H.row
-            [ descriptionColor ]
+            [ descriptionColor
+            , S.textSm
+            , S.fontItalic
+            ]
             [ H.s description ]
+        , bulletPointsView
         ]
 
 

@@ -19,4 +19,4 @@ type ViewFormat
 
 viewFormat : ViewFormat
 viewFormat =
-    Web
+    Pdf
