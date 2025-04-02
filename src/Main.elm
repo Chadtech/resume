@@ -1195,7 +1195,7 @@ resumeLinks =
             [ Attr.href "https://www.github.com/chadtech/resume" ]
             [ H.s "github.com/chadtech/resume" ]
         , Html.a
-            [ Attr.href "https://chad-stearns-resume.surge.sh" ]
+            [ Attr.href "https://chad-stearns-resume.netlify.app/" ]
             [ H.s "View this resume online" ]
         ]
 

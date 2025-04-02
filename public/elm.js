@@ -9030,7 +9030,7 @@ var $author$project$Main$resumeLinks = A2(
 			$rtfeldman$elm_css$Html$Styled$a,
 			_List_fromArray(
 				[
-					$rtfeldman$elm_css$Html$Styled$Attributes$href('https://chad-stearns-resume.surge.sh')
+					$rtfeldman$elm_css$Html$Styled$Attributes$href('https://chad-stearns-resume.netlify.app/')
 				]),
 			_List_fromArray(
 				[
