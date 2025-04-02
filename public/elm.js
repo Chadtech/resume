@@ -5203,13 +5203,24 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$document = _Browser_document;
-var $author$project$Main$flagsDecoder = $elm$json$Json$Decode$succeed(
-	{});
-var $author$project$Main$Model = {};
+var $author$project$Main$Flags = function (pdfMode) {
+	return {pdfMode: pdfMode};
+};
+var $elm$json$Json$Decode$bool = _Json_decodeBool;
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $author$project$Main$flagsDecoder = A2(
+	$elm$json$Json$Decode$map,
+	$author$project$Main$Flags,
+	A2($elm$json$Json$Decode$field, 'pdfMode', $elm$json$Json$Decode$bool));
+var $author$project$ViewFormat$Pdf = {$: 'Pdf'};
+var $author$project$ViewFormat$Web = {$: 'Web'};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Main$init = function (_v0) {
-	return _Utils_Tuple2($author$project$Main$Model, $elm$core$Platform$Cmd$none);
+var $author$project$Main$init = function (flags) {
+	var model = {
+		format: flags.pdfMode ? $author$project$ViewFormat$Pdf : $author$project$ViewFormat$Web
+	};
+	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
@@ -7920,12 +7931,10 @@ var $rtfeldman$elm_css$Css$PxUnits = {$: 'PxUnits'};
 var $rtfeldman$elm_css$Css$px = A2($rtfeldman$elm_css$Css$Internal$lengthConverter, $rtfeldman$elm_css$Css$PxUnits, 'px');
 var $author$project$Style$blue0Str = '#175CFE';
 var $author$project$Style$textBlue0 = A2($rtfeldman$elm_css$Css$property, 'color', $author$project$Style$blue0Str);
-var $author$project$ViewFormat$Web = {$: 'Web'};
-var $author$project$ViewFormat$viewFormat = $author$project$ViewFormat$Web;
 var $rtfeldman$elm_css$Css$width = $rtfeldman$elm_css$Css$prop1('width');
-var $author$project$Main$globalStyles = function () {
+var $author$project$Main$globalStyles = function (model) {
 	var viewFormatStyles = function () {
-		var _v1 = $author$project$ViewFormat$viewFormat;
+		var _v1 = model.format;
 		switch (_v1.$) {
 			case 'Web':
 				return _List_fromArray(
@@ -7944,7 +7953,7 @@ var $author$project$Main$globalStyles = function () {
 		}
 	}();
 	var bg = function () {
-		var _v0 = $author$project$ViewFormat$viewFormat;
+		var _v0 = model.format;
 		switch (_v0.$) {
 			case 'Web':
 				return $author$project$Style$bgGray1;
@@ -7982,7 +7991,7 @@ var $author$project$Main$globalStyles = function () {
 				_List_fromArray(
 					[$author$project$Style$textBlue0]))
 			]));
-}();
+};
 var $rtfeldman$elm_css$Css$prop3 = F4(
 	function (key, argA, argB, argC) {
 		return A2($rtfeldman$elm_css$Css$property, key, argA.value + (' ' + (argB.value + (' ' + argC.value))));
@@ -9717,13 +9726,13 @@ var $author$project$View$Button$toHtml = function (button) {
 				$rtfeldman$elm_css$Html$Styled$text(button.label)
 			]));
 };
-var $author$project$Main$view = function (_v0) {
+var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$core$List$cons,
-		$author$project$Main$globalStyles,
+		$author$project$Main$globalStyles(model),
 		function () {
-			var _v1 = $author$project$ViewFormat$viewFormat;
-			switch (_v1.$) {
+			var _v0 = model.format;
+			switch (_v0.$) {
 				case 'Web':
 					return _List_fromArray(
 						[
@@ -9766,7 +9775,7 @@ var $author$project$Main$view = function (_v0) {
 				case 'Pdf':
 					return $author$project$Main$resume;
 				default:
-					var record = _v1.a;
+					var record = _v0.a;
 					return $author$project$Main$thankYou(record);
 			}
 		}());

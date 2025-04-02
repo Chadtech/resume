@@ -10,7 +10,7 @@ import Html.Styled.Attributes as Attr
 import Json.Decode as JD
 import Style as S
 import View.Button as Button
-import ViewFormat
+import ViewFormat exposing (ViewFormat)
 
 
 port downloadPdf : () -> Cmd msg
@@ -23,7 +23,7 @@ port downloadPdf : () -> Cmd msg
 
 
 type alias Model =
-    {}
+    { format : ViewFormat }
 
 
 type Msg
@@ -82,17 +82,31 @@ type Award
 
 
 type alias Flags =
-    {}
+    { pdfMode : Bool }
 
 
 flagsDecoder : JD.Decoder Flags
 flagsDecoder =
-    JD.succeed {}
+    JD.map Flags
+        (JD.field "pdfMode" JD.bool)
 
 
 init : Flags -> ( Model, Cmd Msg )
-init _ =
-    ( Model, Cmd.none )
+init flags =
+    let
+        model : Model
+        model =
+            { format =
+                if flags.pdfMode then
+                    ViewFormat.Pdf
+
+                else
+                    ViewFormat.Web
+            }
+    in
+    ( model
+    , Cmd.none
+    )
 
 
 
@@ -176,9 +190,9 @@ update msg model =
 
 
 view : Model -> List (Html Msg)
-view _ =
-    globalStyles
-        :: (case ViewFormat.viewFormat of
+view model =
+    globalStyles model
+        :: (case model.format of
                 ViewFormat.Web ->
                     [ H.row
                         [ S.minH0
@@ -1218,12 +1232,12 @@ letterWidth =
     Css.width (Css.px 850)
 
 
-globalStyles : Html Msg
-globalStyles =
+globalStyles : Model -> Html Msg
+globalStyles model =
     let
         bg : Css.Style
         bg =
-            case ViewFormat.viewFormat of
+            case model.format of
                 ViewFormat.Web ->
                     S.bgGray1
 
@@ -1235,7 +1249,7 @@ globalStyles =
 
         viewFormatStyles : List Css.Style
         viewFormatStyles =
-            case ViewFormat.viewFormat of
+            case model.format of
                 ViewFormat.Web ->
                     [ S.p4
                     ]

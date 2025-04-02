@@ -24,7 +24,9 @@
 </body>
 <script>
     var app = Elm.Main.init({
-        flags: {}
+        flags: {
+            pdfMode: location.href.includes('mode=pdf')
+        }
     });
 
     app.ports.downloadPdf.subscribe(function () {
