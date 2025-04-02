@@ -1,6 +1,6 @@
 # Chad Stearns Resume
 
-This is the source code for my resume, which you can see [here](http://chad-stearns-resume.surge.sh/).
+This is the source code for my resume, which you can see [here](https://chad-stearns-resume.netlify.app/).
 
 All the important stuff is at `./src/Main.elm` and `./src/main.rs`.
 
