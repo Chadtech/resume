@@ -16,6 +16,7 @@ enum Cmd {
     DeployWebsite,
     DevThankYou { recipient: String },
     DeployThankYou { recipient: String, suffix: String },
+    CompileForNetlify,
 }
 
 const VIEW_FORMAT_MODULE: &str = r#"module ViewFormat exposing
@@ -99,6 +100,18 @@ async fn main() -> Result<(), String> {
                 },
                 domain,
             )
+        }
+        Cmd::CompileForNetlify => {
+            generate_view_format_file(ViewFormat::Web)?;
+
+            Command::new("elm")
+                .args(["make", "./src/Main.elm", "--output=./public/elm.js"])
+                .spawn()
+                .map_err(|err| err.to_string())?
+                .wait()
+                .map_err(|err| err.to_string())?;
+
+            put_index_in_public()
         }
     }
 }

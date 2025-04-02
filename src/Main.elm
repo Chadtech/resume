@@ -218,19 +218,21 @@ view _ =
 thankYou : { recipient : String, message : String } -> List (Html Msg)
 thankYou args =
     let
+        textColor : Css.Style
+        textColor =
+            S.textGray5
+
         greeting : List (Html Msg)
         greeting =
             [ H.row
-                [ S.textGray4
-                ]
+                []
                 [ H.s <| "Dear " ++ args.recipient ++ "," ]
             ]
 
         messageView : String -> Html Msg
         messageView message =
             H.row
-                [ S.textGray4
-                ]
+                []
                 [ H.s message ]
 
         signature : List (Html Msg)
@@ -238,12 +240,10 @@ thankYou args =
             [ H.col
                 []
                 [ H.row
-                    [ S.textGray4
-                    ]
+                    []
                     [ H.s "Best," ]
                 , H.row
-                    [ S.textGray4
-                    ]
+                    []
                     [ H.s "Chad Stearns" ]
                 ]
             ]
@@ -256,6 +256,7 @@ thankYou args =
         , S.justifyCenter
         , S.p4
         , S.g4
+        , textColor
         ]
         (List.concat
             [ greeting
