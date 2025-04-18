@@ -8578,20 +8578,26 @@ var $author$project$Main$awardView = function (award) {
 };
 var $author$project$Style$yellow4Str = '#B39F4B';
 var $author$project$Style$textYellow4 = A2($rtfeldman$elm_css$Css$property, 'color', $author$project$Style$yellow4Str);
-var $author$project$Main$awards = A2(
-	$author$project$Ext$Html$col,
-	_List_Nil,
-	A2(
-		$elm$core$List$cons,
-		A2(
-			$author$project$Ext$Html$row,
-			_List_fromArray(
-				[$author$project$Style$textYellow4]),
-			_List_fromArray(
-				[
-					$author$project$Ext$Html$s('awards')
-				])),
-		A2($elm$core$List$map, $author$project$Main$awardView, $author$project$Main$allAwards)));
+var $author$project$Main$awards = function (audience) {
+	if (audience.$ === 'Normal') {
+		return A2(
+			$author$project$Ext$Html$col,
+			_List_Nil,
+			A2(
+				$elm$core$List$cons,
+				A2(
+					$author$project$Ext$Html$row,
+					_List_fromArray(
+						[$author$project$Style$textYellow4]),
+					_List_fromArray(
+						[
+							$author$project$Ext$Html$s('awards')
+						])),
+				A2($elm$core$List$map, $author$project$Main$awardView, $author$project$Main$allAwards)));
+	} else {
+		return $rtfeldman$elm_css$Html$Styled$text('');
+	}
+};
 var $rtfeldman$elm_css$Css$flex = $rtfeldman$elm_css$Css$prop1('flex');
 var $rtfeldman$elm_css$Css$int = function (val) {
 	return {
@@ -9582,7 +9588,7 @@ var $author$project$Main$resume = function (audience) {
 					$author$project$Main$jobs(audience),
 					$author$project$Main$projects(audience),
 					$author$project$Main$talks,
-					$author$project$Main$awards,
+					$author$project$Main$awards(audience),
 					$author$project$Main$educationAndVolunteering
 				]))
 		]);

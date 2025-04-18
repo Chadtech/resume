@@ -338,7 +338,7 @@ resume audience =
         [ jobs audience
         , projects audience
         , talks
-        , awards
+        , awards audience
         , educationAndVolunteering
         ]
     ]
@@ -382,15 +382,20 @@ volunteering =
         ]
 
 
-awards : Html Msg
-awards =
-    H.col
-        []
-        (H.row
-            [ S.textYellow4 ]
-            [ H.s "awards" ]
-            :: List.map awardView allAwards
-        )
+awards : Audience -> Html Msg
+awards audience =
+    case audience of
+        Normal ->
+            H.col
+                []
+                (H.row
+                    [ S.textYellow4 ]
+                    [ H.s "awards" ]
+                    :: List.map awardView allAwards
+                )
+
+        FrontendRustRecruiter ->
+            Html.text ""
 
 
 awardView : Award -> Html Msg
