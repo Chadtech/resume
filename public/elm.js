@@ -5203,21 +5203,56 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$document = _Browser_document;
-var $author$project$Main$Flags = function (pdfMode) {
-	return {pdfMode: pdfMode};
-};
+var $author$project$Main$Flags = F2(
+	function (pdfMode, audience) {
+		return {audience: audience, pdfMode: pdfMode};
+	});
+var $author$project$Main$FrontendRustRecruiter = {$: 'FrontendRustRecruiter'};
+var $author$project$Main$Normal = {$: 'Normal'};
+var $elm$json$Json$Decode$andThen = _Json_andThen;
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
+var $elm$json$Json$Decode$fail = _Json_fail;
 var $elm$json$Json$Decode$field = _Json_decodeField;
-var $author$project$Main$flagsDecoder = A2(
-	$elm$json$Json$Decode$map,
-	$author$project$Main$Flags,
-	A2($elm$json$Json$Decode$field, 'pdfMode', $elm$json$Json$Decode$bool));
+var $elm$json$Json$Decode$null = _Json_decodeNull;
+var $elm$json$Json$Decode$oneOf = _Json_oneOf;
+var $elm$json$Json$Decode$nullable = function (decoder) {
+	return $elm$json$Json$Decode$oneOf(
+		_List_fromArray(
+			[
+				$elm$json$Json$Decode$null($elm$core$Maybe$Nothing),
+				A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, decoder)
+			]));
+};
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Main$flagsDecoder = function () {
+	var audienceDecoder = A2(
+		$elm$json$Json$Decode$andThen,
+		function (maybeAudience) {
+			if (maybeAudience.$ === 'Nothing') {
+				return $elm$json$Json$Decode$succeed($author$project$Main$Normal);
+			} else {
+				var audience = maybeAudience.a;
+				if (audience === 'frontend-rust-recruiter') {
+					return $elm$json$Json$Decode$succeed($author$project$Main$FrontendRustRecruiter);
+				} else {
+					return $elm$json$Json$Decode$fail('Unknown audience: ' + audience);
+				}
+			}
+		},
+		$elm$json$Json$Decode$nullable($elm$json$Json$Decode$string));
+	return A3(
+		$elm$json$Json$Decode$map2,
+		$author$project$Main$Flags,
+		A2($elm$json$Json$Decode$field, 'pdfMode', $elm$json$Json$Decode$bool),
+		A2($elm$json$Json$Decode$field, 'audience', audienceDecoder));
+}();
 var $author$project$ViewFormat$Pdf = {$: 'Pdf'};
 var $author$project$ViewFormat$Web = {$: 'Web'};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (flags) {
 	var model = {
+		audience: flags.audience,
 		format: flags.pdfMode ? $author$project$ViewFormat$Pdf : $author$project$ViewFormat$Web
 	};
 	return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
@@ -8697,285 +8732,312 @@ var $author$project$Style$textSm = $rtfeldman$elm_css$Css$batch(
 		]));
 var $author$project$Style$yellow5Str = '#E3D34B';
 var $author$project$Style$textYellow5 = A2($rtfeldman$elm_css$Css$property, 'color', $author$project$Style$yellow5Str);
-var $author$project$Main$jobView = function (job) {
-	var startDate = function () {
-		switch (job.$) {
-			case 'SuperFocus':
-				return 'July 2023';
-			case 'StructionSite':
-				return 'May 2021';
-			case 'MackeyRMS':
-				return 'June 2022';
-			case 'Humio':
-				return 'November 2018';
-			case 'Shore':
-				return 'August 2017';
-			case 'LocalMotors':
-				return 'February 2015';
-			default:
-				return 'October 2013';
-		}
-	}();
-	var role = function () {
-		switch (job.$) {
-			case 'SuperFocus':
-				return 'Senior Software Engineer';
-			case 'StructionSite':
-				return 'Lead Software Engineer';
-			case 'MackeyRMS':
-				return 'Principal Software Engineer';
-			case 'Humio':
-				return 'Senior Software Engineer';
-			case 'Shore':
-				return 'Senior Software Engineer';
-			case 'LocalMotors':
-				return 'Lab Manager';
-			default:
-				return 'Programming Freelancer';
-		}
-	}();
-	var name = function () {
-		switch (job.$) {
-			case 'SuperFocus':
-				return 'SuperFocus.ai';
-			case 'StructionSite':
-				return 'StructionSite';
-			case 'MackeyRMS':
-				return 'MackeyRMS';
-			case 'Humio':
-				return 'Humio';
-			case 'Shore':
-				return 'Shore';
-			case 'LocalMotors':
-				return 'LocalMotors';
-			default:
-				return 'Chadtech';
-		}
-	}();
-	var jobTech = function () {
-		switch (job.$) {
-			case 'SuperFocus':
-				return _List_fromArray(
-					['Elm', 'Rust', 'Python', 'LLMs', 'Voice AI', 'GRPC', 'Axum', 'TypeScript', 'Next.js', 'React', 'Postgres', 'Websockets', 'Tailwind', 'Sqlx']);
-			case 'StructionSite':
-				return _List_fromArray(
-					['Rust', 'Elm', 'WASM', 'Bevy', 'GraphQL', 'React', 'Warp', 'Postgres', 'Tailwind', 'Sqlx']);
-			case 'MackeyRMS':
-				return _List_fromArray(
-					['Elm', 'Haskell', 'JavaScript', 'Angular', 'Servant', 'Web Components']);
-			case 'Humio':
-				return _List_fromArray(
-					['Elm', 'Scala', 'GraphQL', 'Highcharts', 'Web Components']);
-			case 'Shore':
-				return _List_fromArray(
-					['Elm', 'TypeScript', 'React', 'Algolia', 'Web Components']);
-			case 'LocalMotors':
-				return _List_fromArray(
-					['React', 'JavaScript', 'CAD', 'CNC Water Jet', 'Electronics', 'FireBase']);
-			default:
-				return _List_fromArray(
-					['Elm', 'React', 'Hardware', 'Go', 'C++']);
-		}
-	}();
-	var endDate = function () {
-		switch (job.$) {
-			case 'SuperFocus':
-				return 'present';
-			case 'StructionSite':
-				return 'July 2023';
-			case 'MackeyRMS':
-				return 'April 2021';
-			case 'Humio':
-				return 'April 2020';
-			case 'Shore':
-				return 'November 2018';
-			case 'LocalMotors':
-				return 'September 2015';
-			default:
-				return 'July 2017';
-		}
-	}();
-	var timeFrameStr = startDate + (' to ' + endDate);
-	var description = function () {
-		switch (job.$) {
-			case 'SuperFocus':
-				return 'SuperFocus makes superhuman AI\ncustomer service agents, by solving the LLM hallucination problem, ensuring\nreliability and accuracy';
-			case 'StructionSite':
-				return 'StructionSite served the largest construction\ncompanies by providing them with ML powered weekly "google street views" of\nconstruction sites so that project managers can remotely track material progress.';
-			case 'MackeyRMS':
-				return 'MackeyRMS is a tool for investors to collect, retrieve, and discuss their market research.';
-			case 'Humio':
-				return 'Humio provides high performance data querying to large enterprise customers.\n                    On a 25 node system, Humio can query 2.2m events per second and ingest 100TB of data a day.';
-			case 'Shore':
-				return 'Shore provides scheduling and appointment software for small businesses and their customers.';
-			case 'LocalMotors':
-				return 'Local Motors was an experimental car manufacturer that pioneered crowd sourced engineering and made the world\'s first 3D printed car';
-			default:
-				return 'Consultancy for various clients, including programming, hardware, and graphic design.';
-		}
-	}();
-	var bulletPoints = function () {
-		switch (job.$) {
-			case 'SuperFocus':
-				return _List_fromArray(
-					['Consolidated ~10 independent AI codebases into a single database-configurable\napplication, streamlining the deployment and development of AI agents.\n                    ', 'Lead the research and prototyping of a system that allowed dynamic rearrangement of core AI components, optimizing code reuse and scalability.\n                     ', 'Acted as a liaison between management and the engineering team, proactively coordinating\nthe efforts of individual developers. Fostering trust and ensuring project clarity through communication and understanding.']);
-			case 'StructionSite':
-				return _List_fromArray(
-					['Actively contributed to the development of a data-intensive construction project tracking system.\nAlong with my team, we utilized techniques such as asynchronous task queues, event sourcing, and the\narchitecture of a video game engine.\n                    ', 'Ran our weekly sprint meetings, collaborating closely with the product and design teams, and worked\nclosely with engineers to ensure our team had a good mutual understanding of the project, and that we stayed on track.\n                     ']);
-			case 'MackeyRMS':
-				return _List_fromArray(
-					['Lead team through delicate overhaul of entire frontend, both in terms of design and code architecture.']);
-			case 'Humio':
-				return _List_fromArray(
-					['Engineered through small iterative pieces, an advanced infinite scroll system, for time-based and\n                    unbounded data by dynamically measuring irregularly sized DOM elements to accurately adjust scroll position. This system was bi-directional, and could\nfocus on specific elements despite a continuous high volume flow of data.', 'Set the standards for code reviews by consistently providing clear and detailed pull requests,\nthat were recognized by leadership, elevating our code review process.\n                             ', 'Designed and implemented broad architecture of large frontend code base, through \nresearch, discussion, and experimentation.']);
-			case 'Shore':
-				return _List_fromArray(
-					['Took full ownership of implementing core frontend application for customers to edit and create appointments.', 'Maintained and fixed bugs for a large calendar user interface and skeleton "App Shell" architecture,\n                    that loaded and ran smaller frontend applications in designated slots in the page layout.', 'Mentored fellow engineers in Elm programming, guiding team members towards adopting best practices\n                    through code review, pairing sessions, and hosting Elm workshops.']);
-			case 'LocalMotors':
-				return _List_fromArray(
-					['Taught regular classes on CNC milling and 3D printing, enabling members from the general public to visit\n                    and use our machinery.', 'Leveraged my years of makerspace experience to enhance lab operations and foster a creative productive environment.', 'Ran tech events almost nightly, building a network of makers and engineers.']);
-			default:
-				return _List_fromArray(
-					['For Carvana, a website for buying and selling used cars, I wrote high performance audio processing\n                    code as part of a larger project of generating immersive online video car reports.', 'For an early stage Fintech startup, I made a authenticated frontend application with custom RSA encryption that\n                    depicts stock and investment options in a network graph.']);
-		}
-	}();
-	var bulletPointView = function (bulletPoint) {
-		return A2(
-			$author$project$Ext$Html$row,
-			_List_fromArray(
-				[$author$project$Main$descriptionColor]),
-			_List_fromArray(
-				[
-					$author$project$Ext$Html$s('- ' + bulletPoint)
-				]));
-	};
-	var acquisition = function () {
-		switch (job.$) {
-			case 'SuperFocus':
-				return $elm$core$Maybe$Nothing;
-			case 'StructionSite':
-				return $elm$core$Maybe$Just('DroneDeploy');
-			case 'MackeyRMS':
-				return $elm$core$Maybe$Just('InsiderScore');
-			case 'Humio':
-				return $elm$core$Maybe$Just('CrowdStrike');
-			case 'Shore':
-				return $elm$core$Maybe$Nothing;
-			case 'LocalMotors':
-				return $elm$core$Maybe$Nothing;
-			default:
-				return $elm$core$Maybe$Nothing;
-		}
-	}();
-	var acquisitionStr = function () {
-		if (acquisition.$ === 'Just') {
-			var acquiringCompany = acquisition.a;
-			var partyPopperEmoji = $elm$core$Char$fromCode(127881);
-			var acquisitionText = _Utils_eq(job, $author$project$Main$MackeyRMS) ? 'merged with ' : 'acquired by ';
-			return $elm$core$String$concat(
+var $author$project$Main$jobView = F2(
+	function (audience, job) {
+		var startDate = function () {
+			switch (job.$) {
+				case 'SuperFocus':
+					return 'July 2023';
+				case 'StructionSite':
+					return 'May 2021';
+				case 'MackeyRMS':
+					return 'June 2022';
+				case 'Humio':
+					return 'November 2018';
+				case 'Shore':
+					return 'August 2017';
+				case 'LocalMotors':
+					return 'February 2015';
+				default:
+					return 'October 2013';
+			}
+		}();
+		var role = function () {
+			switch (job.$) {
+				case 'SuperFocus':
+					return 'Senior Software Engineer';
+				case 'StructionSite':
+					return 'Lead Software Engineer';
+				case 'MackeyRMS':
+					return 'Principal Software Engineer';
+				case 'Humio':
+					return 'Senior Software Engineer';
+				case 'Shore':
+					return 'Senior Software Engineer';
+				case 'LocalMotors':
+					return 'Lab Manager';
+				default:
+					return 'Programming Freelancer';
+			}
+		}();
+		var name = function () {
+			switch (job.$) {
+				case 'SuperFocus':
+					return 'SuperFocus.ai';
+				case 'StructionSite':
+					return 'StructionSite';
+				case 'MackeyRMS':
+					return 'MackeyRMS';
+				case 'Humio':
+					return 'Humio';
+				case 'Shore':
+					return 'Shore';
+				case 'LocalMotors':
+					return 'LocalMotors';
+				default:
+					return 'Chadtech';
+			}
+		}();
+		var jobTech = function () {
+			switch (job.$) {
+				case 'SuperFocus':
+					var firstTwo = function () {
+						if (audience.$ === 'Normal') {
+							return _List_fromArray(
+								['Elm', 'Rust']);
+						} else {
+							return _List_fromArray(
+								['Rust', 'Elm']);
+						}
+					}();
+					return _Utils_ap(
+						firstTwo,
+						_List_fromArray(
+							['Python', 'LLMs', 'Voice AI', 'GRPC', 'Axum', 'TypeScript', 'Next.js', 'React', 'Postgres', 'Websockets', 'Tailwind', 'Sqlx']));
+				case 'StructionSite':
+					return _List_fromArray(
+						['Rust', 'Elm', 'WASM', 'Bevy', 'GraphQL', 'React', 'Warp', 'Postgres', 'Tailwind', 'Sqlx']);
+				case 'MackeyRMS':
+					return _List_fromArray(
+						['Elm', 'Haskell', 'JavaScript', 'Angular', 'Servant', 'Web Components']);
+				case 'Humio':
+					return _List_fromArray(
+						['Elm', 'Scala', 'GraphQL', 'Highcharts', 'Web Components']);
+				case 'Shore':
+					return _List_fromArray(
+						['Elm', 'TypeScript', 'React', 'Algolia', 'Web Components']);
+				case 'LocalMotors':
+					return _List_fromArray(
+						['React', 'JavaScript', 'CAD', 'CNC Water Jet', 'Electronics', 'FireBase']);
+				default:
+					return _List_fromArray(
+						['Elm', 'React', 'Hardware', 'Go', 'C++']);
+			}
+		}();
+		var endDate = function () {
+			switch (job.$) {
+				case 'SuperFocus':
+					return 'present';
+				case 'StructionSite':
+					return 'July 2023';
+				case 'MackeyRMS':
+					return 'April 2021';
+				case 'Humio':
+					return 'April 2020';
+				case 'Shore':
+					return 'November 2018';
+				case 'LocalMotors':
+					return 'September 2015';
+				default:
+					return 'July 2017';
+			}
+		}();
+		var timeFrameStr = startDate + (' to ' + endDate);
+		var description = function () {
+			switch (job.$) {
+				case 'SuperFocus':
+					return 'SuperFocus makes superhuman AI\ncustomer service agents, by solving the LLM hallucination problem, ensuring\nreliability and accuracy';
+				case 'StructionSite':
+					return 'StructionSite served the largest construction\ncompanies by providing them with ML powered weekly "google street views" of\nconstruction sites so that project managers can remotely track material progress.';
+				case 'MackeyRMS':
+					return 'MackeyRMS is a tool for investors to collect, retrieve, and discuss their market research.';
+				case 'Humio':
+					return 'Humio provides high performance data querying to large enterprise customers.\n                    On a 25 node system, Humio can query 2.2m events per second and ingest 100TB of data a day.';
+				case 'Shore':
+					return 'Shore provides scheduling and appointment software for small businesses and their customers.';
+				case 'LocalMotors':
+					return 'Local Motors was an experimental car manufacturer that pioneered crowd sourced engineering and made the world\'s first 3D printed car';
+				default:
+					return 'Consultancy for various clients, including programming, hardware, and graphic design.';
+			}
+		}();
+		var bulletPoints = function () {
+			switch (job.$) {
+				case 'SuperFocus':
+					return _Utils_ap(
+						_List_fromArray(
+							['Consolidated ~10 independent AI codebases into a single database-configurable\napplication, streamlining the deployment and development of AI agents.\n                    ', 'Lead the research and prototyping of a system that allowed dynamic rearrangement of core AI components, optimizing code reuse and scalability.\n                     ']),
+						function () {
+							if (audience.$ === 'Normal') {
+								return _List_fromArray(
+									['Acted as a liaison between management and the engineering team, proactively coordinating\nthe efforts of individual developers. Fostering trust and ensuring project clarity through communication and understanding.']);
+							} else {
+								return _List_fromArray(
+									['Guided development of logging system shared across several concurrent AI operations.', 'Built a database migration framework to keep various local and production instances of our database in sync.', 'Created build tools for compiling and constructing SDKs on file change.', 'Using dependency injection to mock external services, I developed our system for integration tests of our AI pipeline.']);
+							}
+						}());
+				case 'StructionSite':
+					return _List_fromArray(
+						['Actively contributed to the development of a data-intensive construction project tracking system.\nAlong with my team, we utilized techniques such as asynchronous task queues, event sourcing, and the\narchitecture of a video game engine.\n                    ', 'Ran our weekly sprint meetings, collaborating closely with the product and design teams, and worked\nclosely with engineers to ensure our team had a good mutual understanding of the project, and that we stayed on track.\n                     ']);
+				case 'MackeyRMS':
+					return _List_fromArray(
+						['Lead team through delicate overhaul of entire frontend, both in terms of design and code architecture.']);
+				case 'Humio':
+					return _List_fromArray(
+						['Engineered through small iterative pieces, an advanced infinite scroll system, for time-based and\n                    unbounded data by dynamically measuring irregularly sized DOM elements to accurately adjust scroll position. This system was bi-directional, and could\nfocus on specific elements despite a continuous high volume flow of data.', 'Set the standards for code reviews by consistently providing clear and detailed pull requests,\nthat were recognized by leadership, elevating our code review process.\n                             ', 'Designed and implemented broad architecture of large frontend code base, through \nresearch, discussion, and experimentation.']);
+				case 'Shore':
+					return _List_fromArray(
+						['Took full ownership of implementing core frontend application for customers to edit and create appointments.', 'Maintained and fixed bugs for a large calendar user interface and skeleton "App Shell" architecture,\n                    that loaded and ran smaller frontend applications in designated slots in the page layout.', 'Mentored fellow engineers in Elm programming, guiding team members towards adopting best practices\n                    through code review, pairing sessions, and hosting Elm workshops.']);
+				case 'LocalMotors':
+					return _List_fromArray(
+						['Taught regular classes on CNC milling and 3D printing, enabling members from the general public to visit\n                    and use our machinery.', 'Leveraged my years of makerspace experience to enhance lab operations and foster a creative productive environment.', 'Ran tech events almost nightly, building a network of makers and engineers.']);
+				default:
+					return _List_fromArray(
+						['For Carvana, a website for buying and selling used cars, I wrote high performance audio processing\n                    code as part of a larger project of generating immersive online video car reports.', 'For an early stage Fintech startup, I made a authenticated frontend application with custom RSA encryption that\n                    depicts stock and investment options in a network graph.']);
+			}
+		}();
+		var bulletPointView = function (bulletPoint) {
+			return A2(
+				$author$project$Ext$Html$row,
+				_List_fromArray(
+					[$author$project$Main$descriptionColor]),
 				_List_fromArray(
 					[
-						', ',
-						acquisitionText,
-						acquiringCompany,
-						' ',
-						$elm$core$String$fromChar(partyPopperEmoji)
+						$author$project$Ext$Html$s('- ' + bulletPoint)
 					]));
-		} else {
-			return '';
-		}
-	}();
+		};
+		var acquisition = function () {
+			switch (job.$) {
+				case 'SuperFocus':
+					return $elm$core$Maybe$Nothing;
+				case 'StructionSite':
+					return $elm$core$Maybe$Just('DroneDeploy');
+				case 'MackeyRMS':
+					return $elm$core$Maybe$Just('InsiderScore');
+				case 'Humio':
+					return $elm$core$Maybe$Just('CrowdStrike');
+				case 'Shore':
+					return $elm$core$Maybe$Nothing;
+				case 'LocalMotors':
+					return $elm$core$Maybe$Nothing;
+				default:
+					return $elm$core$Maybe$Nothing;
+			}
+		}();
+		var acquisitionStr = function () {
+			if (acquisition.$ === 'Just') {
+				var acquiringCompany = acquisition.a;
+				var partyPopperEmoji = $elm$core$Char$fromCode(127881);
+				var acquisitionText = _Utils_eq(job, $author$project$Main$MackeyRMS) ? 'merged with ' : 'acquired by ';
+				return $elm$core$String$concat(
+					_List_fromArray(
+						[
+							', ',
+							acquisitionText,
+							acquiringCompany,
+							' ',
+							$elm$core$String$fromChar(partyPopperEmoji)
+						]));
+			} else {
+				return '';
+			}
+		}();
+		return A2(
+			$author$project$Ext$Html$col,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$author$project$Ext$Html$row,
+					_List_fromArray(
+						[$author$project$Style$justifySpaceBetween]),
+					_List_fromArray(
+						[
+							A2(
+							$author$project$Ext$Html$row,
+							_List_fromArray(
+								[$author$project$Style$textYellow5]),
+							_List_fromArray(
+								[
+									$author$project$Ext$Html$s(name)
+								])),
+							A2(
+							$author$project$Ext$Html$row,
+							_List_fromArray(
+								[$author$project$Style$textYellow5]),
+							_List_fromArray(
+								[
+									$author$project$Ext$Html$s(role)
+								]))
+						])),
+					A2(
+					$author$project$Ext$Html$row,
+					_List_fromArray(
+						[$author$project$Style$g2, $author$project$Style$textGray3]),
+					_List_fromArray(
+						[
+							$author$project$Ext$Html$s(
+							_Utils_ap(timeFrameStr, acquisitionStr))
+						])),
+					A2(
+					$rtfeldman$elm_css$Html$Styled$div,
+					_List_fromArray(
+						[
+							$rtfeldman$elm_css$Html$Styled$Attributes$css(
+							_List_fromArray(
+								[$author$project$Main$techColor]))
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$rtfeldman$elm_css$Html$Styled$span,
+							_List_fromArray(
+								[
+									$rtfeldman$elm_css$Html$Styled$Attributes$css(
+									_List_fromArray(
+										[$author$project$Style$textGray4]))
+								]),
+							_List_fromArray(
+								[
+									$author$project$Ext$Html$s('tech: ')
+								])),
+							$author$project$Ext$Html$s(
+							A2($elm$core$String$join, ', ', jobTech))
+						])),
+					A2(
+					$author$project$Ext$Html$row,
+					_List_fromArray(
+						[$author$project$Main$descriptionColor, $author$project$Style$textSm, $author$project$Style$fontItalic]),
+					_List_fromArray(
+						[
+							$author$project$Ext$Html$s(description)
+						])),
+					A2(
+					$author$project$Ext$Html$col,
+					_List_Nil,
+					A2($elm$core$List$map, bulletPointView, bulletPoints))
+				]));
+	});
+var $author$project$Main$jobs = function (audience) {
 	return A2(
 		$author$project$Ext$Html$col,
-		_List_Nil,
 		_List_fromArray(
-			[
-				A2(
-				$author$project$Ext$Html$row,
-				_List_fromArray(
-					[$author$project$Style$justifySpaceBetween]),
-				_List_fromArray(
-					[
-						A2(
-						$author$project$Ext$Html$row,
-						_List_fromArray(
-							[$author$project$Style$textYellow5]),
-						_List_fromArray(
-							[
-								$author$project$Ext$Html$s(name)
-							])),
-						A2(
-						$author$project$Ext$Html$row,
-						_List_fromArray(
-							[$author$project$Style$textYellow5]),
-						_List_fromArray(
-							[
-								$author$project$Ext$Html$s(role)
-							]))
-					])),
-				A2(
-				$author$project$Ext$Html$row,
-				_List_fromArray(
-					[$author$project$Style$g2, $author$project$Style$textGray3]),
-				_List_fromArray(
-					[
-						$author$project$Ext$Html$s(
-						_Utils_ap(timeFrameStr, acquisitionStr))
-					])),
-				A2(
-				$rtfeldman$elm_css$Html$Styled$div,
-				_List_fromArray(
-					[
-						$rtfeldman$elm_css$Html$Styled$Attributes$css(
-						_List_fromArray(
-							[$author$project$Main$techColor]))
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$rtfeldman$elm_css$Html$Styled$span,
-						_List_fromArray(
-							[
-								$rtfeldman$elm_css$Html$Styled$Attributes$css(
-								_List_fromArray(
-									[$author$project$Style$textGray4]))
-							]),
-						_List_fromArray(
-							[
-								$author$project$Ext$Html$s('tech: ')
-							])),
-						$author$project$Ext$Html$s(
-						A2($elm$core$String$join, ', ', jobTech))
-					])),
-				A2(
-				$author$project$Ext$Html$row,
-				_List_fromArray(
-					[$author$project$Main$descriptionColor, $author$project$Style$textSm, $author$project$Style$fontItalic]),
-				_List_fromArray(
-					[
-						$author$project$Ext$Html$s(description)
-					])),
-				A2(
-				$author$project$Ext$Html$col,
-				_List_Nil,
-				A2($elm$core$List$map, bulletPointView, bulletPoints))
-			]));
-};
-var $author$project$Main$jobs = A2(
-	$author$project$Ext$Html$col,
-	_List_fromArray(
-		[$author$project$Style$g2]),
-	A2(
-		$elm$core$List$cons,
+			[$author$project$Style$g2]),
 		A2(
-			$author$project$Ext$Html$row,
-			_List_fromArray(
-				[$author$project$Style$textYellow4]),
-			_List_fromArray(
-				[
-					$author$project$Ext$Html$s('jobs')
-				])),
-		A2($elm$core$List$map, $author$project$Main$jobView, $author$project$Main$allJobs)));
+			$elm$core$List$cons,
+			A2(
+				$author$project$Ext$Html$row,
+				_List_fromArray(
+					[$author$project$Style$textYellow4]),
+				_List_fromArray(
+					[
+						$author$project$Ext$Html$s('jobs')
+					])),
+			A2(
+				$elm$core$List$map,
+				$author$project$Main$jobView(audience),
+				$author$project$Main$allJobs)));
+};
 var $author$project$Style$bgGray4 = A2($rtfeldman$elm_css$Css$property, 'background', $author$project$Style$gray4Str);
 var $rtfeldman$elm_css$Css$pre = {value: 'pre', whiteSpace: $rtfeldman$elm_css$Css$Structure$Compatible};
 var $rtfeldman$elm_css$Css$whiteSpace = $rtfeldman$elm_css$Css$prop1('white-space');
@@ -9057,14 +9119,60 @@ var $rtfeldman$elm_css$Css$paddingBottom = $rtfeldman$elm_css$Css$prop1('padding
 var $author$project$Style$pb2 = $rtfeldman$elm_css$Css$paddingBottom($author$project$Style$s2);
 var $author$project$Main$CtPaint = {$: 'CtPaint'};
 var $author$project$Main$ElmCanvas = {$: 'ElmCanvas'};
+var $author$project$Main$FightLines = {$: 'FightLines'};
 var $author$project$Main$Himesama = {$: 'Himesama'};
 var $author$project$Main$ListExtra = {$: 'ListExtra'};
 var $author$project$Main$Orbiter13 = {$: 'Orbiter13'};
 var $author$project$Main$Radler = {$: 'Radler'};
 var $author$project$Main$Roc = {$: 'Roc'};
 var $author$project$Main$SolafideForbesNashMachine = {$: 'SolafideForbesNashMachine'};
-var $author$project$Main$allProjects = _List_fromArray(
-	[$author$project$Main$Roc, $author$project$Main$Radler, $author$project$Main$CtPaint, $author$project$Main$ListExtra, $author$project$Main$Orbiter13, $author$project$Main$ElmCanvas, $author$project$Main$Himesama, $author$project$Main$SolafideForbesNashMachine]);
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $author$project$Main$allProjects = function (audience) {
+	return A2(
+		$elm$core$List$filterMap,
+		$elm$core$Basics$identity,
+		_List_fromArray(
+			[
+				$elm$core$Maybe$Just($author$project$Main$Roc),
+				function () {
+				if (audience.$ === 'Normal') {
+					return $elm$core$Maybe$Nothing;
+				} else {
+					return $elm$core$Maybe$Just($author$project$Main$FightLines);
+				}
+			}(),
+				$elm$core$Maybe$Just($author$project$Main$Radler),
+				$elm$core$Maybe$Just($author$project$Main$CtPaint),
+				$elm$core$Maybe$Just($author$project$Main$ListExtra),
+				$elm$core$Maybe$Just($author$project$Main$Orbiter13),
+				$elm$core$Maybe$Just($author$project$Main$ElmCanvas),
+				$elm$core$Maybe$Just($author$project$Main$Himesama),
+				function () {
+				if (audience.$ === 'Normal') {
+					return $elm$core$Maybe$Just($author$project$Main$SolafideForbesNashMachine);
+				} else {
+					return $elm$core$Maybe$Nothing;
+				}
+			}()
+			]));
+};
 var $author$project$Main$projectView = function (project) {
 	var url = function () {
 		switch (project.$) {
@@ -9082,8 +9190,10 @@ var $author$project$Main$projectView = function (project) {
 				return 'https://github.com/Chadtech/Himesama';
 			case 'Orbiter13':
 				return 'https://www.chadtech.us/orbiter-13/';
-			default:
+			case 'SolafideForbesNashMachine':
 				return 'https://hackaday.com/2014/05/20/the-solafide-forbes-nash-organ/';
+			default:
+				return 'https://github.com/Chadtech/FightLines';
 		}
 	}();
 	var tech = function () {
@@ -9109,9 +9219,12 @@ var $author$project$Main$projectView = function (project) {
 			case 'Orbiter13':
 				return _List_fromArray(
 					['Elm', 'CoffeeScript', 'Express']);
-			default:
+			case 'SolafideForbesNashMachine':
 				return _List_fromArray(
 					['Circuitry', 'Laser Cutting']);
+			default:
+				return _List_fromArray(
+					['Rust', 'Seed', 'WASM']);
 		}
 	}();
 	var projectName = function () {
@@ -9130,8 +9243,10 @@ var $author$project$Main$projectView = function (project) {
 				return 'Himesama';
 			case 'Orbiter13':
 				return 'Orbiter13';
-			default:
+			case 'SolafideForbesNashMachine':
 				return 'Solafide Forbes Nash Machine';
+			default:
+				return 'Fight Lines';
 		}
 	}();
 	var description = function () {
@@ -9150,8 +9265,10 @@ var $author$project$Main$projectView = function (project) {
 				return 'A reimplementation of React from scratch with my own attempt\nat state management. Incidentally, Himesama has a much smaller bundle size than React, which\nis a significant performance bottleneck for many large React projects.\n                    ';
 			case 'Orbiter13':
 				return 'A difficult videogame based on orbital mechanics.';
-			default:
+			case 'SolafideForbesNashMachine':
 				return 'To explore my interest in unusual music tuning systems,\nI designed and built 3 audio synthesizers. With help, I designed a sine wave oscillator\ncircuit, etched 48 of these oscillators onto circuit boards, and then put them into\nwooden enclosures I designed and laser cut.';
+			default:
+				return 'A turn based strategy video game with online match making using Rust for both the frontend and backend.';
 		}
 	}();
 	var bulletPoints = function () {
@@ -9241,21 +9358,26 @@ var $author$project$Main$projectView = function (project) {
 				bulletPointsView
 			]));
 };
-var $author$project$Main$projects = A2(
-	$author$project$Ext$Html$col,
-	_List_fromArray(
-		[$author$project$Style$g2]),
-	A2(
-		$elm$core$List$cons,
+var $author$project$Main$projects = function (audience) {
+	return A2(
+		$author$project$Ext$Html$col,
+		_List_fromArray(
+			[$author$project$Style$g2]),
 		A2(
-			$author$project$Ext$Html$row,
-			_List_fromArray(
-				[$author$project$Style$textYellow4]),
-			_List_fromArray(
-				[
-					$author$project$Ext$Html$s('projects')
-				])),
-		A2($elm$core$List$map, $author$project$Main$projectView, $author$project$Main$allProjects)));
+			$elm$core$List$cons,
+			A2(
+				$author$project$Ext$Html$row,
+				_List_fromArray(
+					[$author$project$Style$textYellow4]),
+				_List_fromArray(
+					[
+						$author$project$Ext$Html$s('projects')
+					])),
+			A2(
+				$elm$core$List$map,
+				$author$project$Main$projectView,
+				$author$project$Main$allProjects(audience))));
+};
 var $rtfeldman$elm_css$Css$paddingLeft = $rtfeldman$elm_css$Css$prop1('padding-left');
 var $author$project$Style$pl2 = $rtfeldman$elm_css$Css$paddingLeft($author$project$Style$s2);
 var $rtfeldman$elm_css$Css$paddingRight = $rtfeldman$elm_css$Css$prop1('padding-right');
@@ -9447,16 +9569,24 @@ var $author$project$Main$talks = A2(
 					$author$project$Ext$Html$s('talks')
 				])),
 		A2($elm$core$List$map, $author$project$Main$talkView, $author$project$Main$allTalks)));
-var $author$project$Main$resume = _List_fromArray(
-	[
-		$author$project$Main$nameAndInfo,
-		A2(
-		$author$project$Ext$Html$col,
-		_List_fromArray(
-			[$author$project$Style$px2, $author$project$Style$pb2, $author$project$Style$g2]),
-		_List_fromArray(
-			[$author$project$Main$jobs, $author$project$Main$projects, $author$project$Main$talks, $author$project$Main$awards, $author$project$Main$educationAndVolunteering]))
-	]);
+var $author$project$Main$resume = function (audience) {
+	return _List_fromArray(
+		[
+			$author$project$Main$nameAndInfo,
+			A2(
+			$author$project$Ext$Html$col,
+			_List_fromArray(
+				[$author$project$Style$px2, $author$project$Style$pb2, $author$project$Style$g2]),
+			_List_fromArray(
+				[
+					$author$project$Main$jobs(audience),
+					$author$project$Main$projects(audience),
+					$author$project$Main$talks,
+					$author$project$Main$awards,
+					$author$project$Main$educationAndVolunteering
+				]))
+		]);
+};
 var $rtfeldman$elm_css$Css$prop2 = F3(
 	function (key, argA, argB) {
 		return A2($rtfeldman$elm_css$Css$property, key, argA.value + (' ' + argB.value));
@@ -9569,24 +9699,6 @@ var $rtfeldman$elm_css$Css$active = $rtfeldman$elm_css$Css$pseudoClass('active')
 var $author$project$Style$yellow1Str = '#302507';
 var $author$project$Style$bgYellow1 = A2($rtfeldman$elm_css$Css$property, 'background', $author$project$Style$yellow1Str);
 var $rtfeldman$elm_css$Html$Styled$button = $rtfeldman$elm_css$Html$Styled$node('button');
-var $elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _v0 = f(mx);
-		if (_v0.$ === 'Just') {
-			var x = _v0.a;
-			return A2($elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var $elm$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			$elm$core$List$maybeCons(f),
-			_List_Nil,
-			xs);
-	});
 var $rtfeldman$elm_css$Css$hover = $rtfeldman$elm_css$Css$pseudoClass('hover');
 var $author$project$Style$yellow0Str = '#161303';
 var $author$project$Style$yellow0Color = $rtfeldman$elm_css$Css$hex($author$project$Style$yellow0Str);
@@ -9750,7 +9862,7 @@ var $author$project$Main$view = function (model) {
 									$author$project$Ext$Html$col,
 									_List_fromArray(
 										[$author$project$Main$letterWidth, $author$project$Style$bgNightwood1, $author$project$Style$overflowAuto, $author$project$Style$indent, $author$project$Style$g2]),
-									$author$project$Main$resume)
+									$author$project$Main$resume(model.audience))
 								])),
 							A2(
 							$author$project$Ext$Html$row,
@@ -9773,7 +9885,7 @@ var $author$project$Main$view = function (model) {
 								]))
 						]);
 				case 'Pdf':
-					return $author$project$Main$resume;
+					return $author$project$Main$resume(model.audience);
 				default:
 					var record = _v0.a;
 					return $author$project$Main$thankYou(record);

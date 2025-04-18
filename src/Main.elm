@@ -23,7 +23,9 @@ port downloadPdf : () -> Cmd msg
 
 
 type alias Model =
-    { format : ViewFormat }
+    { format : ViewFormat
+    , audience : Audience
+    }
 
 
 type Msg
@@ -39,6 +41,7 @@ type Project
     | Himesama
     | Orbiter13
     | SolafideForbesNashMachine
+    | FightLines
 
 
 type Job
@@ -62,7 +65,7 @@ type Talk
 
 
 type Meetups
-    = RustPhilaDelphia
+    = RustPhiladelphia
     | ElmMunich
     | ElmNYC
     | CoffeeAndCode
@@ -75,6 +78,11 @@ type Award
     | HtmlGameHackathon
 
 
+type Audience
+    = Normal
+    | FrontendRustRecruiter
+
+
 
 ----------------------------------------------------------------
 -- INIT --
@@ -82,13 +90,36 @@ type Award
 
 
 type alias Flags =
-    { pdfMode : Bool }
+    { pdfMode : Bool
+    , audience : Audience
+    }
 
 
 flagsDecoder : JD.Decoder Flags
 flagsDecoder =
-    JD.map Flags
+    let
+        audienceDecoder : JD.Decoder Audience
+        audienceDecoder =
+            JD.string
+                |> JD.nullable
+                |> JD.andThen
+                    (\maybeAudience ->
+                        case maybeAudience of
+                            Nothing ->
+                                JD.succeed Normal
+
+                            Just audience ->
+                                case audience of
+                                    "frontend-rust-recruiter" ->
+                                        JD.succeed FrontendRustRecruiter
+
+                                    _ ->
+                                        JD.fail ("Unknown audience: " ++ audience)
+                    )
+    in
+    JD.map2 Flags
         (JD.field "pdfMode" JD.bool)
+        (JD.field "audience" audienceDecoder)
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -102,6 +133,7 @@ init flags =
 
                 else
                     ViewFormat.Web
+            , audience = flags.audience
             }
     in
     ( model
@@ -129,7 +161,7 @@ allTalks =
 
 allMeetups : List Meetups
 allMeetups =
-    [ RustPhilaDelphia
+    [ RustPhiladelphia
     , ElmMunich
     , ElmNYC
     , CoffeeAndCode
@@ -145,17 +177,29 @@ allAwards =
     ]
 
 
-allProjects : List Project
-allProjects =
-    [ Roc
-    , Radler
-    , CtPaint
-    , ListExtra
-    , Orbiter13
-    , ElmCanvas
-    , Himesama
-    , SolafideForbesNashMachine
+allProjects : Audience -> List Project
+allProjects audience =
+    [ Just Roc
+    , case audience of
+        Normal ->
+            Nothing
+
+        FrontendRustRecruiter ->
+            Just FightLines
+    , Just Radler
+    , Just CtPaint
+    , Just ListExtra
+    , Just Orbiter13
+    , Just ElmCanvas
+    , Just Himesama
+    , case audience of
+        Normal ->
+            Just SolafideForbesNashMachine
+
+        FrontendRustRecruiter ->
+            Nothing
     ]
+        |> List.filterMap identity
 
 
 allJobs : List Job
@@ -206,7 +250,7 @@ view model =
                             , S.indent
                             , S.g2
                             ]
-                            resume
+                            (resume model.audience)
                         ]
                     , H.row
                         [ S.justifyCenter ]
@@ -222,7 +266,7 @@ view model =
                     ]
 
                 ViewFormat.Pdf ->
-                    resume
+                    resume model.audience
 
                 ViewFormat.ThankYou record ->
                     thankYou record
@@ -283,16 +327,16 @@ thankYou args =
     ]
 
 
-resume : List (Html Msg)
-resume =
+resume : Audience -> List (Html Msg)
+resume audience =
     [ nameAndInfo
     , H.col
         [ S.px2
         , S.pb2
         , S.g2
         ]
-        [ jobs
-        , projects
+        [ jobs audience
+        , projects audience
         , talks
         , awards
         , educationAndVolunteering
@@ -398,20 +442,20 @@ awardView award =
         ]
 
 
-jobs : Html Msg
-jobs =
+jobs : Audience -> Html Msg
+jobs audience =
     H.col
         [ S.g2
         ]
         (H.row
             [ S.textYellow4 ]
             [ H.s "jobs" ]
-            :: List.map jobView allJobs
+            :: List.map (jobView audience) allJobs
         )
 
 
-jobView : Job -> Html Msg
-jobView job =
+jobView : Audience -> Job -> Html Msg
+jobView audience job =
     let
         name : String
         name =
@@ -569,21 +613,30 @@ jobView job =
         jobTech =
             case job of
                 SuperFocus ->
-                    [ "Elm"
-                    , "Rust"
-                    , "Python"
-                    , "LLMs"
-                    , "Voice AI"
-                    , "GRPC"
-                    , "Axum"
-                    , "TypeScript"
-                    , "Next.js"
-                    , "React"
-                    , "Postgres"
-                    , "Websockets"
-                    , "Tailwind"
-                    , "Sqlx"
-                    ]
+                    let
+                        firstTwo : List String
+                        firstTwo =
+                            case audience of
+                                Normal ->
+                                    [ "Elm", "Rust" ]
+
+                                FrontendRustRecruiter ->
+                                    [ "Rust", "Elm" ]
+                    in
+                    firstTwo
+                        ++ [ "Python"
+                           , "LLMs"
+                           , "Voice AI"
+                           , "GRPC"
+                           , "Axum"
+                           , "TypeScript"
+                           , "Next.js"
+                           , "React"
+                           , "Postgres"
+                           , "Websockets"
+                           , "Tailwind"
+                           , "Sqlx"
+                           ]
 
                 StructionSite ->
                     [ "Rust"
@@ -678,9 +731,20 @@ application, streamlining the deployment and development of AI agents.
                     """
                     , """Lead the research and prototyping of a system that allowed dynamic rearrangement of core AI components, optimizing code reuse and scalability.
                      """
-                    , """Acted as a liaison between management and the engineering team, proactively coordinating
-the efforts of individual developers. Fostering trust and ensuring project clarity through communication and understanding."""
                     ]
+                        ++ (case audience of
+                                Normal ->
+                                    [ """Acted as a liaison between management and the engineering team, proactively coordinating
+the efforts of individual developers. Fostering trust and ensuring project clarity through communication and understanding."""
+                                    ]
+
+                                FrontendRustRecruiter ->
+                                    [ """Guided development of logging system shared across several concurrent AI operations."""
+                                    , """Built a database migration framework to keep various local and production instances of our database in sync."""
+                                    , """Created build tools for compiling and constructing SDKs on file change."""
+                                    , """Using dependency injection to mock external services, I developed our system for integration tests of our AI pipeline."""
+                                    ]
+                           )
 
                 StructionSite ->
                     [ """Actively contributed to the development of a data-intensive construction project tracking system.
@@ -971,15 +1035,15 @@ talkView talk =
         ]
 
 
-projects : Html Msg
-projects =
+projects : Audience -> Html Msg
+projects audience =
     H.col
         [ S.g2
         ]
         (H.row
             [ S.textYellow4 ]
             [ H.s "projects" ]
-            :: List.map projectView allProjects
+            :: List.map projectView (allProjects audience)
         )
 
 
@@ -1013,6 +1077,9 @@ projectView project =
                 SolafideForbesNashMachine ->
                     "Solafide Forbes Nash Machine"
 
+                FightLines ->
+                    "Fight Lines"
+
         url : String
         url =
             case project of
@@ -1039,6 +1106,9 @@ projectView project =
 
                 SolafideForbesNashMachine ->
                     "https://hackaday.com/2014/05/20/the-solafide-forbes-nash-organ/"
+
+                FightLines ->
+                    "https://github.com/Chadtech/FightLines"
 
         description : String
         description =
@@ -1090,6 +1160,9 @@ I designed and built 3 audio synthesizers. With help, I designed a sine wave osc
 circuit, etched 48 of these oscillators onto circuit boards, and then put them into
 wooden enclosures I designed and laser cut."""
 
+                FightLines ->
+                    """A turn based strategy video game with online match making using Rust for both the frontend and backend."""
+
         tech : List String
         tech =
             case project of
@@ -1116,6 +1189,9 @@ wooden enclosures I designed and laser cut."""
 
                 SolafideForbesNashMachine ->
                     [ "Circuitry", "Laser Cutting" ]
+
+                FightLines ->
+                    [ "Rust", "Seed", "WASM" ]
 
         bulletPoints : List String
         bulletPoints =

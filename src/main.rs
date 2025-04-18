@@ -4,6 +4,8 @@ use notify::event::ModifyKind;
 use notify::{EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use std::process::Command;
 
+const PORT: u16 = 1754;
+
 #[derive(Debug, Parser, Clone)]
 #[clap(
     author = "Chad Stearns",
@@ -131,7 +133,7 @@ async fn elm_js() -> impl Responder {
 
 async fn run_server() -> Result<(), String> {
     let r = HttpServer::new(|| App::new().service(html).service(elm_js))
-        .bind(("127.0.0.1", 1754))
+        .bind(("127.0.0.1", PORT))
         .map_err(|err| err.to_string())?
         .run()
         .await
@@ -160,9 +162,9 @@ fn deploy(view_format: ViewFormat, domain: String) -> Result<(), String> {
     Command::new("surge")
         .args(["./public", domain.as_str()])
         .spawn()
-        .map_err(|err| err.to_string())?
+        .map_err(|err| format!("A {}", err.to_string()))?
         .wait()
-        .map_err(|err| err.to_string())?;
+        .map_err(|err| format!("B {}", err.to_string()))?;
 
     Ok(())
 }
