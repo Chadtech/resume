@@ -734,7 +734,7 @@ construction sites so that project managers can remotely track material progress
                     [ """Consolidated ~10 independent AI codebases into a single database-configurable
 application, streamlining the deployment and development of AI agents.
                     """
-                    , """Lead the research and prototyping of a system that allowed dynamic rearrangement of core AI components, optimizing code reuse and scalability.
+                    , """Led the research and prototyping of a system that allowed dynamic rearrangement of core AI components, optimizing code reuse and scalability.
                      """
                     ]
                         ++ (case audience of
@@ -762,7 +762,7 @@ closely with engineers to ensure our team had a good mutual understanding of the
                     ]
 
                 MackeyRMS ->
-                    [ "Lead team through delicate overhaul of entire frontend, both in terms of design and code architecture." ]
+                    [ "Led team through delicate overhaul of entire frontend, both in terms of design and code architecture." ]
 
                 Humio ->
                     [ """Engineered through small iterative pieces, an advanced infinite scroll system, for time-based and

@@ -8872,7 +8872,7 @@ var $author$project$Main$jobView = F2(
 				case 'SuperFocus':
 					return _Utils_ap(
 						_List_fromArray(
-							['Consolidated ~10 independent AI codebases into a single database-configurable\napplication, streamlining the deployment and development of AI agents.\n                    ', 'Lead the research and prototyping of a system that allowed dynamic rearrangement of core AI components, optimizing code reuse and scalability.\n                     ']),
+							['Consolidated ~10 independent AI codebases into a single database-configurable\napplication, streamlining the deployment and development of AI agents.\n                    ', 'Led the research and prototyping of a system that allowed dynamic rearrangement of core AI components, optimizing code reuse and scalability.\n                     ']),
 						function () {
 							if (audience.$ === 'Normal') {
 								return _List_fromArray(
@@ -8887,7 +8887,7 @@ var $author$project$Main$jobView = F2(
 						['Actively contributed to the development of a data-intensive construction project tracking system.\nAlong with my team, we utilized techniques such as asynchronous task queues, event sourcing, and the\narchitecture of a video game engine.\n                    ', 'Ran our weekly sprint meetings, collaborating closely with the product and design teams, and worked\nclosely with engineers to ensure our team had a good mutual understanding of the project, and that we stayed on track.\n                     ']);
 				case 'MackeyRMS':
 					return _List_fromArray(
-						['Lead team through delicate overhaul of entire frontend, both in terms of design and code architecture.']);
+						['Led team through delicate overhaul of entire frontend, both in terms of design and code architecture.']);
 				case 'Humio':
 					return _List_fromArray(
 						['Engineered through small iterative pieces, an advanced infinite scroll system, for time-based and\n                    unbounded data by dynamically measuring irregularly sized DOM elements to accurately adjust scroll position. This system was bi-directional, and could\nfocus on specific elements despite a continuous high volume flow of data.', 'Set the standards for code reviews by consistently providing clear and detailed pull requests,\nthat were recognized by leadership, elevating our code review process.\n                             ', 'Designed and implemented broad architecture of large frontend code base, through \nresearch, discussion, and experimentation.']);
