@@ -5209,6 +5209,7 @@ var $author$project$Main$Flags = F2(
 	});
 var $author$project$Main$FrontendRustRecruiter = {$: 'FrontendRustRecruiter'};
 var $author$project$Main$Normal = {$: 'Normal'};
+var $author$project$Main$TraditionalHr = {$: 'TraditionalHr'};
 var $elm$json$Json$Decode$andThen = _Json_andThen;
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm$json$Json$Decode$fail = _Json_fail;
@@ -5232,10 +5233,13 @@ var $author$project$Main$flagsDecoder = function () {
 				return $elm$json$Json$Decode$succeed($author$project$Main$Normal);
 			} else {
 				var audience = maybeAudience.a;
-				if (audience === 'frontend-rust-recruiter') {
-					return $elm$json$Json$Decode$succeed($author$project$Main$FrontendRustRecruiter);
-				} else {
-					return $elm$json$Json$Decode$fail('Unknown audience: ' + audience);
+				switch (audience) {
+					case 'frontend-rust-recruiter':
+						return $elm$json$Json$Decode$succeed($author$project$Main$FrontendRustRecruiter);
+					case 'traditional-hr':
+						return $elm$json$Json$Decode$succeed($author$project$Main$TraditionalHr);
+					default:
+						return $elm$json$Json$Decode$fail('Unknown audience: ' + audience);
 				}
 			}
 		},
@@ -7799,6 +7803,7 @@ var $rtfeldman$elm_css$Css$Global$a = $rtfeldman$elm_css$Css$Global$typeSelector
 var $author$project$Style$batch = $rtfeldman$elm_css$Css$batch;
 var $author$project$Style$gray1Str = '#2C2826';
 var $author$project$Style$bgGray1 = A2($rtfeldman$elm_css$Css$property, 'background', $author$project$Style$gray1Str);
+var $author$project$Style$bgWhite = A2($rtfeldman$elm_css$Css$property, 'background', '#FFFFFF');
 var $rtfeldman$elm_css$Css$Global$body = $rtfeldman$elm_css$Css$Global$typeSelector('body');
 var $rtfeldman$elm_css$Css$borderBox = {backgroundClip: $rtfeldman$elm_css$Css$Structure$Compatible, boxSizing: $rtfeldman$elm_css$Css$Structure$Compatible, value: 'border-box'};
 var $rtfeldman$elm_css$Css$boxSizing = $rtfeldman$elm_css$Css$prop1('box-sizing');
@@ -7969,8 +7974,8 @@ var $author$project$Style$textBlue0 = A2($rtfeldman$elm_css$Css$property, 'color
 var $rtfeldman$elm_css$Css$width = $rtfeldman$elm_css$Css$prop1('width');
 var $author$project$Main$globalStyles = function (model) {
 	var viewFormatStyles = function () {
-		var _v1 = model.format;
-		switch (_v1.$) {
+		var _v3 = model.format;
+		switch (_v3.$) {
 			case 'Web':
 				return _List_fromArray(
 					[$author$project$Style$p4]);
@@ -7982,20 +7987,34 @@ var $author$project$Main$globalStyles = function (model) {
 						$author$project$Style$g2
 					]);
 			default:
-				var record = _v1.a;
 				return _List_fromArray(
 					[$author$project$Style$justifyCenter, $author$project$Style$itemsCenter]);
 		}
 	}();
+	var fonts = function () {
+		var _v2 = model.audience;
+		if (_v2.$ === 'TraditionalHr') {
+			return _List_fromArray(
+				['Inter', 'Helvetica', 'Arial', 'sans-serif']);
+		} else {
+			return _List_fromArray(
+				['\'JetBrains Mono\'', 'inter', 'monospace', 'sans-serif']);
+		}
+	}();
 	var bg = function () {
-		var _v0 = model.format;
-		switch (_v0.$) {
-			case 'Web':
-				return $author$project$Style$bgGray1;
-			case 'Pdf':
-				return $author$project$Style$bgNightwood1;
-			default:
-				return $author$project$Style$bgNightwood1;
+		var _v0 = model.audience;
+		if (_v0.$ === 'TraditionalHr') {
+			return $author$project$Style$bgWhite;
+		} else {
+			var _v1 = model.format;
+			switch (_v1.$) {
+				case 'Web':
+					return $author$project$Style$bgGray1;
+				case 'Pdf':
+					return $author$project$Style$bgNightwood1;
+				default:
+					return $author$project$Style$bgNightwood1;
+			}
 		}
 	}();
 	return $rtfeldman$elm_css$Css$Global$global(
@@ -8013,9 +8032,7 @@ var $author$project$Main$globalStyles = function (model) {
 				_List_fromArray(
 					[
 						$author$project$Style$batch(viewFormatStyles),
-						$rtfeldman$elm_css$Css$fontFamilies(
-						_List_fromArray(
-							['\'JetBrains Mono\'', 'inter', 'monospace', 'sans-serif'])),
+						$rtfeldman$elm_css$Css$fontFamilies(fonts),
 						$author$project$Style$col,
 						$author$project$Style$m0,
 						bg,
@@ -8476,6 +8493,12 @@ var $author$project$Main$HtmlGameHackathon = {$: 'HtmlGameHackathon'};
 var $author$project$Main$allAwards = _List_fromArray(
 	[$author$project$Main$ArduinoWearables, $author$project$Main$HtmlGameHackathon]);
 var $rtfeldman$elm_css$Html$Styled$a = $rtfeldman$elm_css$Html$Styled$node('a');
+var $author$project$Style$none = $author$project$Style$batch(_List_Nil);
+var $author$project$Style$gray5Str = '#E0D6CA';
+var $author$project$Style$textGray5 = A2($rtfeldman$elm_css$Css$property, 'color', $author$project$Style$gray5Str);
+var $author$project$Main$descriptionColor = function (audience) {
+	return _Utils_eq(audience, $author$project$Main$TraditionalHr) ? $author$project$Style$none : $author$project$Style$textGray5;
+};
 var $rtfeldman$elm_css$VirtualDom$Styled$property = F2(
 	function (key, value) {
 		return A3(
@@ -8519,83 +8542,99 @@ var $rtfeldman$elm_css$VirtualDom$Styled$text = function (str) {
 };
 var $rtfeldman$elm_css$Html$Styled$text = $rtfeldman$elm_css$VirtualDom$Styled$text;
 var $author$project$Ext$Html$s = $rtfeldman$elm_css$Html$Styled$text;
-var $author$project$Style$gray4Str = '#B0A69A';
-var $author$project$Style$textGray4 = A2($rtfeldman$elm_css$Css$property, 'color', $author$project$Style$gray4Str);
-var $author$project$Main$awardView = function (award) {
-	var year = function () {
-		if (award.$ === 'ArduinoWearables') {
-			return '2014';
-		} else {
-			return '2012';
-		}
-	}();
-	var url = function () {
-		if (award.$ === 'ArduinoWearables') {
-			return 'https://imgur.com/QfDKg7P';
-		} else {
-			return 'https://hackphx.com/html5games_winter2012/';
-		}
-	}();
-	var name = function () {
-		if (award.$ === 'ArduinoWearables') {
-			return 'Arduino Wearables';
-		} else {
-			return 'HTML5 Game';
-		}
-	}();
-	return A2(
-		$author$project$Ext$Html$col,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				$author$project$Ext$Html$row,
-				_List_fromArray(
-					[$author$project$Style$justifySpaceBetween, $author$project$Style$textGray4]),
-				_List_fromArray(
-					[
-						A2(
-						$rtfeldman$elm_css$Html$Styled$div,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$author$project$Ext$Html$s('Winner of jury prize at '),
-								A2(
-								$rtfeldman$elm_css$Html$Styled$a,
-								_List_fromArray(
-									[
-										$rtfeldman$elm_css$Html$Styled$Attributes$href(url)
-									]),
-								_List_fromArray(
-									[
-										$author$project$Ext$Html$s(name)
-									])),
-								$author$project$Ext$Html$s(' hackathon')
-							])),
-						$author$project$Ext$Html$s(year)
-					]))
-			]));
-};
-var $author$project$Style$yellow4Str = '#B39F4B';
-var $author$project$Style$textYellow4 = A2($rtfeldman$elm_css$Css$property, 'color', $author$project$Style$yellow4Str);
-var $author$project$Main$awards = function (audience) {
-	if (audience.$ === 'Normal') {
+var $author$project$Main$awardView = F2(
+	function (audience, award) {
+		var year = function () {
+			if (award.$ === 'ArduinoWearables') {
+				return '2014';
+			} else {
+				return '2012';
+			}
+		}();
+		var url = function () {
+			if (award.$ === 'ArduinoWearables') {
+				return 'https://imgur.com/QfDKg7P';
+			} else {
+				return 'https://hackphx.com/html5games_winter2012/';
+			}
+		}();
+		var name = function () {
+			if (award.$ === 'ArduinoWearables') {
+				return 'Arduino Wearables';
+			} else {
+				return 'HTML5 Game';
+			}
+		}();
 		return A2(
 			$author$project$Ext$Html$col,
 			_List_Nil,
-			A2(
-				$elm$core$List$cons,
-				A2(
+			_List_fromArray(
+				[
+					A2(
 					$author$project$Ext$Html$row,
 					_List_fromArray(
-						[$author$project$Style$textYellow4]),
+						[
+							$author$project$Style$justifySpaceBetween,
+							$author$project$Main$descriptionColor(audience)
+						]),
 					_List_fromArray(
 						[
-							$author$project$Ext$Html$s('awards')
-						])),
-				A2($elm$core$List$map, $author$project$Main$awardView, $author$project$Main$allAwards)));
-	} else {
-		return $rtfeldman$elm_css$Html$Styled$text('');
+							A2(
+							$rtfeldman$elm_css$Html$Styled$div,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$author$project$Ext$Html$s('Winner of jury prize at '),
+									A2(
+									$rtfeldman$elm_css$Html$Styled$a,
+									_List_fromArray(
+										[
+											$rtfeldman$elm_css$Html$Styled$Attributes$href(url)
+										]),
+									_List_fromArray(
+										[
+											$author$project$Ext$Html$s(name)
+										])),
+									$author$project$Ext$Html$s(' hackathon')
+								])),
+							$author$project$Ext$Html$s(year)
+						]))
+				]));
+	});
+var $author$project$Style$gray3Str = '#807672';
+var $author$project$Style$textGray3 = A2($rtfeldman$elm_css$Css$property, 'color', $author$project$Style$gray3Str);
+var $author$project$Style$yellow4Str = '#B39F4B';
+var $author$project$Style$textYellow4 = A2($rtfeldman$elm_css$Css$property, 'color', $author$project$Style$yellow4Str);
+var $author$project$Main$mainSectionColor = function (audience) {
+	return _Utils_eq(audience, $author$project$Main$TraditionalHr) ? $author$project$Style$textGray3 : $author$project$Style$textYellow4;
+};
+var $author$project$Main$awards = function (audience) {
+	var awards_ = A2(
+		$author$project$Ext$Html$col,
+		_List_Nil,
+		A2(
+			$elm$core$List$cons,
+			A2(
+				$author$project$Ext$Html$row,
+				_List_fromArray(
+					[
+						$author$project$Main$mainSectionColor(audience)
+					]),
+				_List_fromArray(
+					[
+						$author$project$Ext$Html$s('awards')
+					])),
+			A2(
+				$elm$core$List$map,
+				$author$project$Main$awardView(audience),
+				$author$project$Main$allAwards)));
+	switch (audience.$) {
+		case 'Normal':
+			return awards_;
+		case 'FrontendRustRecruiter':
+			return $rtfeldman$elm_css$Html$Styled$text('');
+		default:
+			return awards_;
 	}
 };
 var $rtfeldman$elm_css$Css$flex = $rtfeldman$elm_css$Css$prop1('flex');
@@ -8615,88 +8654,106 @@ var $rtfeldman$elm_css$Css$int = function (val) {
 };
 var $author$project$Style$flex1 = $rtfeldman$elm_css$Css$flex(
 	$rtfeldman$elm_css$Css$int(1));
-var $author$project$Style$gray5Str = '#E0D6CA';
-var $author$project$Style$textGray5 = A2($rtfeldman$elm_css$Css$property, 'color', $author$project$Style$gray5Str);
-var $author$project$Main$education = A2(
-	$author$project$Ext$Html$col,
-	_List_fromArray(
-		[$author$project$Style$textGray4, $author$project$Style$flex1]),
-	_List_fromArray(
-		[
-			A2(
-			$author$project$Ext$Html$row,
-			_List_fromArray(
-				[$author$project$Style$textYellow4]),
-			_List_fromArray(
-				[
-					$author$project$Ext$Html$s('education')
-				])),
-			A2(
-			$author$project$Ext$Html$row,
-			_List_fromArray(
-				[$author$project$Style$textGray5]),
-			_List_fromArray(
-				[
-					$author$project$Ext$Html$s('Arizona State University')
-				])),
-			A2(
-			$author$project$Ext$Html$row,
-			_List_Nil,
-			_List_fromArray(
-				[
-					$author$project$Ext$Html$s('Bachelor of Science in Economics')
-				])),
-			A2(
-			$author$project$Ext$Html$row,
-			_List_Nil,
-			_List_fromArray(
-				[
-					$author$project$Ext$Html$s('Graduated 2013')
-				]))
-		]));
-var $author$project$Main$volunteering = A2(
-	$author$project$Ext$Html$col,
-	_List_fromArray(
-		[$author$project$Style$textGray4, $author$project$Style$flex1]),
-	_List_fromArray(
-		[
-			A2(
-			$author$project$Ext$Html$row,
-			_List_fromArray(
-				[$author$project$Style$textYellow4]),
-			_List_fromArray(
-				[
-					$author$project$Ext$Html$s('volunteering')
-				])),
-			A2(
-			$author$project$Ext$Html$row,
-			_List_fromArray(
-				[$author$project$Style$textGray5]),
-			_List_fromArray(
-				[
-					$author$project$Ext$Html$s('HeatSync Labs, 501(c)(3) non-profit')
-				])),
-			A2(
-			$author$project$Ext$Html$row,
-			_List_Nil,
-			_List_fromArray(
-				[
-					$author$project$Ext$Html$s('Treasurer and active member')
-				])),
-			A2(
-			$author$project$Ext$Html$row,
-			_List_Nil,
-			_List_fromArray(
-				[
-					$author$project$Ext$Html$s('2012 to 2014')
-				]))
-		]));
-var $author$project$Main$educationAndVolunteering = A2(
-	$author$project$Ext$Html$row,
-	_List_fromArray(
-		[$author$project$Style$g2]),
-	_List_fromArray(
-		[$author$project$Main$education, $author$project$Main$volunteering]));
+var $author$project$Style$textGray1 = A2($rtfeldman$elm_css$Css$property, 'color', $author$project$Style$gray1Str);
+var $author$project$Main$education = function (audience) {
+	var color = _Utils_eq(audience, $author$project$Main$TraditionalHr) ? $author$project$Style$textGray1 : $author$project$Style$textGray5;
+	return A2(
+		$author$project$Ext$Html$col,
+		_List_fromArray(
+			[color, $author$project$Style$flex1]),
+		_List_fromArray(
+			[
+				A2(
+				$author$project$Ext$Html$row,
+				_List_fromArray(
+					[
+						$author$project$Main$mainSectionColor(audience)
+					]),
+				_List_fromArray(
+					[
+						$author$project$Ext$Html$s('education')
+					])),
+				A2(
+				$author$project$Ext$Html$row,
+				_List_fromArray(
+					[
+						$author$project$Main$descriptionColor(audience)
+					]),
+				_List_fromArray(
+					[
+						$author$project$Ext$Html$s('Arizona State University')
+					])),
+				A2(
+				$author$project$Ext$Html$row,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$author$project$Ext$Html$s('Bachelor of Science in Economics')
+					])),
+				A2(
+				$author$project$Ext$Html$row,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$author$project$Ext$Html$s('Graduated 2013')
+					]))
+			]));
+};
+var $author$project$Main$volunteering = function (audience) {
+	var color = _Utils_eq(audience, $author$project$Main$TraditionalHr) ? $author$project$Style$textGray1 : $author$project$Style$textGray5;
+	return A2(
+		$author$project$Ext$Html$col,
+		_List_fromArray(
+			[color, $author$project$Style$flex1]),
+		_List_fromArray(
+			[
+				A2(
+				$author$project$Ext$Html$row,
+				_List_fromArray(
+					[
+						$author$project$Main$mainSectionColor(audience)
+					]),
+				_List_fromArray(
+					[
+						$author$project$Ext$Html$s('volunteering')
+					])),
+				A2(
+				$author$project$Ext$Html$row,
+				_List_fromArray(
+					[
+						$author$project$Main$descriptionColor(audience)
+					]),
+				_List_fromArray(
+					[
+						$author$project$Ext$Html$s('HeatSync Labs, 501(c)(3) non-profit')
+					])),
+				A2(
+				$author$project$Ext$Html$row,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$author$project$Ext$Html$s('Treasurer and active member')
+					])),
+				A2(
+				$author$project$Ext$Html$row,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$author$project$Ext$Html$s('2012 to 2014')
+					]))
+			]));
+};
+var $author$project$Main$educationAndVolunteering = function (audience) {
+	return A2(
+		$author$project$Ext$Html$row,
+		_List_fromArray(
+			[$author$project$Style$g2]),
+		_List_fromArray(
+			[
+				$author$project$Main$education(audience),
+				$author$project$Main$volunteering(audience)
+			]));
+};
 var $author$project$Main$Chadtech = {$: 'Chadtech'};
 var $author$project$Main$Humio = {$: 'Humio'};
 var $author$project$Main$LocalMotors = {$: 'LocalMotors'};
@@ -8715,17 +8772,6 @@ var $rtfeldman$elm_css$Html$Styled$Internal$css = function (styles) {
 	return A3($rtfeldman$elm_css$VirtualDom$Styled$Attribute, classProperty, true, cssTemplate);
 };
 var $rtfeldman$elm_css$Html$Styled$Attributes$css = $rtfeldman$elm_css$Html$Styled$Internal$css;
-var $author$project$Main$descriptionColor = $author$project$Style$textGray5;
-var $rtfeldman$elm_css$Css$fontStyle = $rtfeldman$elm_css$Css$prop1('font-style');
-var $rtfeldman$elm_css$Css$italic = {fontStyle: $rtfeldman$elm_css$Css$Structure$Compatible, value: 'italic'};
-var $author$project$Style$fontItalic = $rtfeldman$elm_css$Css$fontStyle($rtfeldman$elm_css$Css$italic);
-var $elm$core$Char$fromCode = _Char_fromCode;
-var $rtfeldman$elm_css$Html$Styled$span = $rtfeldman$elm_css$Html$Styled$node('span');
-var $author$project$Style$red1Str = '#F21D23';
-var $author$project$Style$textRed1 = A2($rtfeldman$elm_css$Css$property, 'color', $author$project$Style$red1Str);
-var $author$project$Main$techColor = $author$project$Style$textRed1;
-var $author$project$Style$gray3Str = '#807672';
-var $author$project$Style$textGray3 = A2($rtfeldman$elm_css$Css$property, 'color', $author$project$Style$gray3Str);
 var $rtfeldman$elm_css$Css$fontSize = $rtfeldman$elm_css$Css$prop1('font-size');
 var $rtfeldman$elm_css$Css$lineHeight = $rtfeldman$elm_css$Css$prop1('line-height');
 var $author$project$Style$textSm = $rtfeldman$elm_css$Css$batch(
@@ -8736,10 +8782,31 @@ var $author$project$Style$textSm = $rtfeldman$elm_css$Css$batch(
 			$rtfeldman$elm_css$Css$lineHeight(
 			$rtfeldman$elm_css$Css$rem(1.25))
 		]));
+var $author$project$Main$descriptionSize = function (audience) {
+	return _Utils_eq(audience, $author$project$Main$TraditionalHr) ? $author$project$Style$none : $author$project$Style$textSm;
+};
+var $rtfeldman$elm_css$Css$fontStyle = $rtfeldman$elm_css$Css$prop1('font-style');
+var $rtfeldman$elm_css$Css$italic = {fontStyle: $rtfeldman$elm_css$Css$Structure$Compatible, value: 'italic'};
+var $author$project$Style$fontItalic = $rtfeldman$elm_css$Css$fontStyle($rtfeldman$elm_css$Css$italic);
+var $elm$core$Char$fromCode = _Char_fromCode;
+var $rtfeldman$elm_css$Html$Styled$span = $rtfeldman$elm_css$Html$Styled$node('span');
+var $author$project$Style$red0Str = '#651A20';
+var $author$project$Style$textRed0 = A2($rtfeldman$elm_css$Css$property, 'color', $author$project$Style$red0Str);
+var $author$project$Style$red1Str = '#F21D23';
+var $author$project$Style$textRed1 = A2($rtfeldman$elm_css$Css$property, 'color', $author$project$Style$red1Str);
+var $author$project$Main$techColor = function (audience) {
+	return _Utils_eq(audience, $author$project$Main$TraditionalHr) ? $author$project$Style$textRed0 : $author$project$Style$textRed1;
+};
+var $author$project$Style$gray4Str = '#B0A69A';
+var $author$project$Style$textGray4 = A2($rtfeldman$elm_css$Css$property, 'color', $author$project$Style$gray4Str);
+var $author$project$Main$techLabelColor = function (audience) {
+	return _Utils_eq(audience, $author$project$Main$TraditionalHr) ? $author$project$Style$textRed0 : $author$project$Style$textGray4;
+};
 var $author$project$Style$yellow5Str = '#E3D34B';
 var $author$project$Style$textYellow5 = A2($rtfeldman$elm_css$Css$property, 'color', $author$project$Style$yellow5Str);
 var $author$project$Main$jobView = F2(
 	function (audience, job) {
+		var timeFrameColor = _Utils_eq(audience, $author$project$Main$TraditionalHr) ? $author$project$Style$textGray1 : $author$project$Style$textGray3;
 		var startDate = function () {
 			switch (job.$) {
 				case 'SuperFocus':
@@ -8776,6 +8843,7 @@ var $author$project$Main$jobView = F2(
 					return 'Programming Freelancer';
 			}
 		}();
+		var nameAndRoleColor = _Utils_eq(audience, $author$project$Main$TraditionalHr) ? $author$project$Style$textBlue0 : $author$project$Style$textYellow5;
 		var name = function () {
 			switch (job.$) {
 				case 'SuperFocus':
@@ -8798,12 +8866,12 @@ var $author$project$Main$jobView = F2(
 			switch (job.$) {
 				case 'SuperFocus':
 					var firstTwo = function () {
-						if (audience.$ === 'Normal') {
-							return _List_fromArray(
-								['Elm', 'Rust']);
-						} else {
+						if (audience.$ === 'FrontendRustRecruiter') {
 							return _List_fromArray(
 								['Rust', 'Elm']);
+						} else {
+							return _List_fromArray(
+								['Elm', 'Rust']);
 						}
 					}();
 					return _Utils_ap(
@@ -8874,12 +8942,12 @@ var $author$project$Main$jobView = F2(
 						_List_fromArray(
 							['Consolidated ~10 independent AI codebases into a single database-configurable\napplication, streamlining the deployment and development of AI agents.\n                    ', 'Led the research and prototyping of a system that allowed dynamic rearrangement of core AI components, optimizing code reuse and scalability.\n                     ']),
 						function () {
-							if (audience.$ === 'Normal') {
-								return _List_fromArray(
-									['Acted as a liaison between management and the engineering team, proactively coordinating\nthe efforts of individual developers. Fostering trust and ensuring project clarity through communication and understanding.']);
-							} else {
+							if (audience.$ === 'FrontendRustRecruiter') {
 								return _List_fromArray(
 									['Guided development of logging system shared across several concurrent AI operations.', 'Built a database migration framework to keep various local and production instances of our database in sync.', 'Created build tools for compiling and constructing SDKs on file change.', 'Using dependency injection to mock external services, I developed our system for integration tests of our AI pipeline.']);
+							} else {
+								return _List_fromArray(
+									['Acted as a liaison between management and the engineering team, proactively coordinating\nthe efforts of individual developers. Fostering trust and ensuring project clarity through communication and understanding.']);
 							}
 						}());
 				case 'StructionSite':
@@ -8906,7 +8974,9 @@ var $author$project$Main$jobView = F2(
 			return A2(
 				$author$project$Ext$Html$row,
 				_List_fromArray(
-					[$author$project$Main$descriptionColor]),
+					[
+						$author$project$Main$descriptionColor(audience)
+					]),
 				_List_fromArray(
 					[
 						$author$project$Ext$Html$s('- ' + bulletPoint)
@@ -8962,7 +9032,7 @@ var $author$project$Main$jobView = F2(
 							A2(
 							$author$project$Ext$Html$row,
 							_List_fromArray(
-								[$author$project$Style$textYellow5]),
+								[nameAndRoleColor]),
 							_List_fromArray(
 								[
 									$author$project$Ext$Html$s(name)
@@ -8970,7 +9040,7 @@ var $author$project$Main$jobView = F2(
 							A2(
 							$author$project$Ext$Html$row,
 							_List_fromArray(
-								[$author$project$Style$textYellow5]),
+								[nameAndRoleColor]),
 							_List_fromArray(
 								[
 									$author$project$Ext$Html$s(role)
@@ -8979,7 +9049,7 @@ var $author$project$Main$jobView = F2(
 					A2(
 					$author$project$Ext$Html$row,
 					_List_fromArray(
-						[$author$project$Style$g2, $author$project$Style$textGray3]),
+						[$author$project$Style$g2, timeFrameColor]),
 					_List_fromArray(
 						[
 							$author$project$Ext$Html$s(
@@ -8991,7 +9061,9 @@ var $author$project$Main$jobView = F2(
 						[
 							$rtfeldman$elm_css$Html$Styled$Attributes$css(
 							_List_fromArray(
-								[$author$project$Main$techColor]))
+								[
+									$author$project$Main$techColor(audience)
+								]))
 						]),
 					_List_fromArray(
 						[
@@ -9001,7 +9073,9 @@ var $author$project$Main$jobView = F2(
 								[
 									$rtfeldman$elm_css$Html$Styled$Attributes$css(
 									_List_fromArray(
-										[$author$project$Style$textGray4]))
+										[
+											$author$project$Main$techLabelColor(audience)
+										]))
 								]),
 							_List_fromArray(
 								[
@@ -9013,7 +9087,11 @@ var $author$project$Main$jobView = F2(
 					A2(
 					$author$project$Ext$Html$row,
 					_List_fromArray(
-						[$author$project$Main$descriptionColor, $author$project$Style$textSm, $author$project$Style$fontItalic]),
+						[
+							$author$project$Main$descriptionColor(audience),
+							$author$project$Main$descriptionSize(audience),
+							$author$project$Style$fontItalic
+						]),
 					_List_fromArray(
 						[
 							$author$project$Ext$Html$s(description)
@@ -9034,7 +9112,9 @@ var $author$project$Main$jobs = function (audience) {
 			A2(
 				$author$project$Ext$Html$row,
 				_List_fromArray(
-					[$author$project$Style$textYellow4]),
+					[
+						$author$project$Main$mainSectionColor(audience)
+					]),
 				_List_fromArray(
 					[
 						$author$project$Ext$Html$s('jobs')
@@ -9158,10 +9238,10 @@ var $author$project$Main$allProjects = function (audience) {
 			[
 				$elm$core$Maybe$Just($author$project$Main$Roc),
 				function () {
-				if (audience.$ === 'Normal') {
-					return $elm$core$Maybe$Nothing;
-				} else {
+				if (audience.$ === 'FrontendRustRecruiter') {
 					return $elm$core$Maybe$Just($author$project$Main$FightLines);
+				} else {
+					return $elm$core$Maybe$Nothing;
 				}
 			}(),
 				$elm$core$Maybe$Just($author$project$Main$Radler),
@@ -9171,199 +9251,212 @@ var $author$project$Main$allProjects = function (audience) {
 				$elm$core$Maybe$Just($author$project$Main$ElmCanvas),
 				$elm$core$Maybe$Just($author$project$Main$Himesama),
 				function () {
-				if (audience.$ === 'Normal') {
-					return $elm$core$Maybe$Just($author$project$Main$SolafideForbesNashMachine);
-				} else {
-					return $elm$core$Maybe$Nothing;
+				switch (audience.$) {
+					case 'Normal':
+						return $elm$core$Maybe$Just($author$project$Main$SolafideForbesNashMachine);
+					case 'TraditionalHr':
+						return $elm$core$Maybe$Just($author$project$Main$SolafideForbesNashMachine);
+					default:
+						return $elm$core$Maybe$Nothing;
 				}
 			}()
 			]));
 };
-var $author$project$Main$projectView = function (project) {
-	var url = function () {
-		switch (project.$) {
-			case 'Roc':
-				return 'https://www.roc-lang.org/';
-			case 'Radler':
-				return 'https://github.com/Chadtech/Radler-ui';
-			case 'CtPaint':
-				return 'https://ctpaint.org/app';
-			case 'ListExtra':
-				return 'https://package.elm-lang.org/packages/elm-community/list-extra/latest/';
-			case 'ElmCanvas':
-				return 'https://github.com/Elm-Canvas/elm-canvas';
-			case 'Himesama':
-				return 'https://github.com/Chadtech/Himesama';
-			case 'Orbiter13':
-				return 'https://www.chadtech.us/orbiter-13/';
-			case 'SolafideForbesNashMachine':
-				return 'https://hackaday.com/2014/05/20/the-solafide-forbes-nash-organ/';
-			default:
-				return 'https://github.com/Chadtech/FightLines';
-		}
-	}();
-	var tech = function () {
-		switch (project.$) {
-			case 'Roc':
+var $author$project$Main$projectView = F2(
+	function (audience, project) {
+		var url = function () {
+			switch (project.$) {
+				case 'Roc':
+					return 'https://www.roc-lang.org/';
+				case 'Radler':
+					return 'https://github.com/Chadtech/Radler-ui';
+				case 'CtPaint':
+					return 'https://ctpaint.org/app';
+				case 'ListExtra':
+					return 'https://package.elm-lang.org/packages/elm-community/list-extra/latest/';
+				case 'ElmCanvas':
+					return 'https://github.com/Elm-Canvas/elm-canvas';
+				case 'Himesama':
+					return 'https://github.com/Chadtech/Himesama';
+				case 'Orbiter13':
+					return 'https://www.chadtech.us/orbiter-13/';
+				case 'SolafideForbesNashMachine':
+					return 'https://hackaday.com/2014/05/20/the-solafide-forbes-nash-organ/';
+				default:
+					return 'https://github.com/Chadtech/FightLines';
+			}
+		}();
+		var tech = function () {
+			switch (project.$) {
+				case 'Roc':
+					return _List_fromArray(
+						['Rust', 'Zig', 'LLVM']);
+				case 'Radler':
+					return _List_fromArray(
+						['Haskell', 'Elm', 'Electron']);
+				case 'CtPaint':
+					return _List_fromArray(
+						['Elm', 'Html Canvas', 'Node', 'AWS Lambda']);
+				case 'ListExtra':
+					return _List_fromArray(
+						['Elm']);
+				case 'ElmCanvas':
+					return _List_fromArray(
+						['Elm, JavaScript', 'Html Canvas']);
+				case 'Himesama':
+					return _List_fromArray(
+						['CoffeeScript']);
+				case 'Orbiter13':
+					return _List_fromArray(
+						['Elm', 'CoffeeScript', 'Express']);
+				case 'SolafideForbesNashMachine':
+					return _List_fromArray(
+						['Circuitry', 'Laser Cutting']);
+				default:
+					return _List_fromArray(
+						['Rust', 'Seed', 'WASM']);
+			}
+		}();
+		var projectName = function () {
+			switch (project.$) {
+				case 'Roc':
+					return 'Roc';
+				case 'Radler':
+					return 'Radler';
+				case 'CtPaint':
+					return 'CtPaint';
+				case 'ListExtra':
+					return 'elm-community/list-extra';
+				case 'ElmCanvas':
+					return 'elm-canvas';
+				case 'Himesama':
+					return 'Himesama';
+				case 'Orbiter13':
+					return 'Orbiter13';
+				case 'SolafideForbesNashMachine':
+					return 'Solafide Forbes Nash Machine';
+				default:
+					return 'Fight Lines';
+			}
+		}();
+		var description = function () {
+			switch (project.$) {
+				case 'Roc':
+					return 'During my weekends from 2019 to 2021, I\ncontributed to the Roc programming language.\n';
+				case 'Radler':
+					return 'I made Radler myself to make music with. The user\ninterface is for writing a musical score, and the backend generates audio of the music\nand efficiently updates the audio as the user makes changes to the musical score.';
+				case 'CtPaint':
+					return 'In 2016 I ran an (unsuccessful) kickstarter campaign for online\npixel art software. I made the software anyway, with not only the complete\nfunctionality of drawing images, but also connectivity features to import any image from\nthe web, and tiered access granting bonus features like uploading images.';
+				case 'ListExtra':
+					return 'List.Extra is one of the most downloaded Elm packages. It provides helper functions for\n                    working with lists. Most of my impact on this project is not so much writing code,\nbut refereeing submissions from others. I make sure every submission\nis truly useful, and implemented in a performant way. Every major version\nupdate risks disrupting the wider Elm community, and every\ncontribution risks confusing developers if not carefully thought through.';
+				case 'ElmCanvas':
+					return 'To make CtPaint (listed above), I needed to use HTML Canvas. Elm Canvas\n                    is a library that\nbrings the canvas HTML element into Elm, and provides an api for drawing on HTML canvases through JavaScript FFI.\nThe main challenge was how to use the mutable\ncanvas element in an immutable functional programming language.\n';
+				case 'Himesama':
+					return 'A reimplementation of React from scratch with my own attempt\nat state management. Incidentally, Himesama has a much smaller bundle size than React, which\nis a significant performance bottleneck for many large React projects.\n                    ';
+				case 'Orbiter13':
+					return 'A difficult videogame based on orbital mechanics.';
+				case 'SolafideForbesNashMachine':
+					return 'To explore my interest in unusual music tuning systems,\nI designed and built 3 audio synthesizers. With help, I designed a sine wave oscillator\ncircuit, etched 48 of these oscillators onto circuit boards, and then put them into\nwooden enclosures I designed and laser cut.';
+				default:
+					return 'A turn based strategy video game with online match making using Rust for both the frontend and backend.';
+			}
+		}();
+		var bulletPoints = function () {
+			if (project.$ === 'Roc') {
 				return _List_fromArray(
-					['Rust', 'Zig', 'LLVM']);
-			case 'Radler':
-				return _List_fromArray(
-					['Haskell', 'Elm', 'Electron']);
-			case 'CtPaint':
-				return _List_fromArray(
-					['Elm', 'Html Canvas', 'Node', 'AWS Lambda']);
-			case 'ListExtra':
-				return _List_fromArray(
-					['Elm']);
-			case 'ElmCanvas':
-				return _List_fromArray(
-					['Elm, JavaScript', 'Html Canvas']);
-			case 'Himesama':
-				return _List_fromArray(
-					['CoffeeScript']);
-			case 'Orbiter13':
-				return _List_fromArray(
-					['Elm', 'CoffeeScript', 'Express']);
-			case 'SolafideForbesNashMachine':
-				return _List_fromArray(
-					['Circuitry', 'Laser Cutting']);
-			default:
-				return _List_fromArray(
-					['Rust', 'Seed', 'WASM']);
-		}
-	}();
-	var projectName = function () {
-		switch (project.$) {
-			case 'Roc':
-				return 'Roc';
-			case 'Radler':
-				return 'Radler';
-			case 'CtPaint':
-				return 'CtPaint';
-			case 'ListExtra':
-				return 'elm-community/list-extra';
-			case 'ElmCanvas':
-				return 'elm-canvas';
-			case 'Himesama':
-				return 'Himesama';
-			case 'Orbiter13':
-				return 'Orbiter13';
-			case 'SolafideForbesNashMachine':
-				return 'Solafide Forbes Nash Machine';
-			default:
-				return 'Fight Lines';
-		}
-	}();
-	var description = function () {
-		switch (project.$) {
-			case 'Roc':
-				return 'During my weekends from 2019 to 2021, I\ncontributed to the Roc programming language.\n';
-			case 'Radler':
-				return 'I made Radler myself to make music with. The user\ninterface is for writing a musical score, and the backend generates audio of the music\nand efficiently updates the audio as the user makes changes to the musical score.';
-			case 'CtPaint':
-				return 'In 2016 I ran an (unsuccessful) kickstarter campaign for online\npixel art software. I made the software anyway, with not only the complete\nfunctionality of drawing images, but also connectivity features to import any image from\nthe web, and tiered access granting bonus features like uploading images.';
-			case 'ListExtra':
-				return 'List.Extra is one of the most downloaded Elm packages. It provides helper functions for\n                    working with lists. Most of my impact on this project is not so much writing code,\nbut refereeing submissions from others. I make sure every submission\nis truly useful, and implemented in a performant way. Every major version\nupdate risks disrupting the wider Elm community, and every\ncontribution risks confusing developers if not carefully thought through.';
-			case 'ElmCanvas':
-				return 'To make CtPaint (listed above), I needed to use HTML Canvas. Elm Canvas\n                    is a library that\nbrings the canvas HTML element into Elm, and provides an api for drawing on HTML canvases through JavaScript FFI.\nThe main challenge was how to use the mutable\ncanvas element in an immutable functional programming language.\n';
-			case 'Himesama':
-				return 'A reimplementation of React from scratch with my own attempt\nat state management. Incidentally, Himesama has a much smaller bundle size than React, which\nis a significant performance bottleneck for many large React projects.\n                    ';
-			case 'Orbiter13':
-				return 'A difficult videogame based on orbital mechanics.';
-			case 'SolafideForbesNashMachine':
-				return 'To explore my interest in unusual music tuning systems,\nI designed and built 3 audio synthesizers. With help, I designed a sine wave oscillator\ncircuit, etched 48 of these oscillators onto circuit boards, and then put them into\nwooden enclosures I designed and laser cut.';
-			default:
-				return 'A turn based strategy video game with online match making using Rust for both the frontend and backend.';
-		}
-	}();
-	var bulletPoints = function () {
-		if (project.$ === 'Roc') {
-			return _List_fromArray(
-				['wrote a large majority of the Roc code formatter, which\n                    takes an abstract syntax tree,\n                    and converts it into textual code.', 'Wrote the first implementation of the\n                    core List functions compilation down to LLVM machine code.', 'Designed Roc\'s HashMaps.', 'Made the code that generates html files rendering Roc\n                    module documentation.']);
-		} else {
-			return _List_Nil;
-		}
-	}();
-	var bulletPointsView = function () {
-		if ($elm$core$List$isEmpty(bulletPoints)) {
-			return $author$project$Ext$Html$s('');
-		} else {
-			var bulletPointView = function (bulletPoint) {
+					['wrote a large majority of the Roc code formatter, which\n                    takes an abstract syntax tree,\n                    and converts it into textual code.', 'Wrote the first implementation of the\n                    core List functions compilation down to LLVM machine code.', 'Designed Roc\'s HashMaps.', 'Made the code that generates html files rendering Roc\n                    module documentation.']);
+			} else {
+				return _List_Nil;
+			}
+		}();
+		var bulletPointsView = function () {
+			if ($elm$core$List$isEmpty(bulletPoints)) {
+				return $author$project$Ext$Html$s('');
+			} else {
+				var bulletPointView = function (bulletPoint) {
+					return A2(
+						$author$project$Ext$Html$row,
+						_List_fromArray(
+							[
+								$author$project$Main$descriptionColor(audience)
+							]),
+						_List_fromArray(
+							[
+								$author$project$Ext$Html$s('- ' + bulletPoint)
+							]));
+				};
 				return A2(
+					$author$project$Ext$Html$col,
+					_List_Nil,
+					A2($elm$core$List$map, bulletPointView, bulletPoints));
+			}
+		}();
+		return A2(
+			$author$project$Ext$Html$col,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
 					$author$project$Ext$Html$row,
 					_List_fromArray(
-						[$author$project$Main$descriptionColor]),
+						[$author$project$Style$justifySpaceBetween]),
 					_List_fromArray(
 						[
-							$author$project$Ext$Html$s('- ' + bulletPoint)
-						]));
-			};
-			return A2(
-				$author$project$Ext$Html$col,
-				_List_Nil,
-				A2($elm$core$List$map, bulletPointView, bulletPoints));
-		}
-	}();
-	return A2(
-		$author$project$Ext$Html$col,
-		_List_fromArray(
-			[$author$project$Style$textGray4]),
-		_List_fromArray(
-			[
-				A2(
-				$author$project$Ext$Html$row,
-				_List_fromArray(
-					[$author$project$Style$justifySpaceBetween]),
-				_List_fromArray(
-					[
-						A2(
-						$rtfeldman$elm_css$Html$Styled$a,
-						_List_fromArray(
-							[
-								$rtfeldman$elm_css$Html$Styled$Attributes$href(url)
-							]),
-						_List_fromArray(
-							[
-								$author$project$Ext$Html$s(projectName)
-							]))
-					])),
-				A2(
-				$rtfeldman$elm_css$Html$Styled$div,
-				_List_fromArray(
-					[
-						$rtfeldman$elm_css$Html$Styled$Attributes$css(
-						_List_fromArray(
-							[$author$project$Main$techColor]))
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$rtfeldman$elm_css$Html$Styled$span,
-						_List_fromArray(
-							[
-								$rtfeldman$elm_css$Html$Styled$Attributes$css(
-								_List_fromArray(
-									[$author$project$Style$textGray4]))
-							]),
-						_List_fromArray(
-							[
-								$author$project$Ext$Html$s('tech: ')
-							])),
-						$author$project$Ext$Html$s(
-						A2($elm$core$String$join, ', ', tech))
-					])),
-				A2(
-				$author$project$Ext$Html$row,
-				_List_fromArray(
-					[$author$project$Main$descriptionColor, $author$project$Style$textSm, $author$project$Style$fontItalic]),
-				_List_fromArray(
-					[
-						$author$project$Ext$Html$s(description)
-					])),
-				bulletPointsView
-			]));
-};
+							A2(
+							$rtfeldman$elm_css$Html$Styled$a,
+							_List_fromArray(
+								[
+									$rtfeldman$elm_css$Html$Styled$Attributes$href(url)
+								]),
+							_List_fromArray(
+								[
+									$author$project$Ext$Html$s(projectName)
+								]))
+						])),
+					A2(
+					$rtfeldman$elm_css$Html$Styled$div,
+					_List_fromArray(
+						[
+							$rtfeldman$elm_css$Html$Styled$Attributes$css(
+							_List_fromArray(
+								[
+									$author$project$Main$techColor(audience)
+								]))
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$rtfeldman$elm_css$Html$Styled$span,
+							_List_fromArray(
+								[
+									$rtfeldman$elm_css$Html$Styled$Attributes$css(
+									_List_fromArray(
+										[
+											$author$project$Main$techLabelColor(audience)
+										]))
+								]),
+							_List_fromArray(
+								[
+									$author$project$Ext$Html$s('tech: ')
+								])),
+							$author$project$Ext$Html$s(
+							A2($elm$core$String$join, ', ', tech))
+						])),
+					A2(
+					$author$project$Ext$Html$row,
+					_List_fromArray(
+						[
+							$author$project$Main$descriptionColor(audience),
+							$author$project$Main$descriptionSize(audience),
+							$author$project$Style$fontItalic
+						]),
+					_List_fromArray(
+						[
+							$author$project$Ext$Html$s(description)
+						])),
+					bulletPointsView
+				]));
+	});
 var $author$project$Main$projects = function (audience) {
 	return A2(
 		$author$project$Ext$Html$col,
@@ -9374,14 +9467,16 @@ var $author$project$Main$projects = function (audience) {
 			A2(
 				$author$project$Ext$Html$row,
 				_List_fromArray(
-					[$author$project$Style$textYellow4]),
+					[
+						$author$project$Main$mainSectionColor(audience)
+					]),
 				_List_fromArray(
 					[
 						$author$project$Ext$Html$s('projects')
 					])),
 			A2(
 				$elm$core$List$map,
-				$author$project$Main$projectView,
+				$author$project$Main$projectView(audience),
 				$author$project$Main$allProjects(audience))));
 };
 var $rtfeldman$elm_css$Css$paddingLeft = $rtfeldman$elm_css$Css$prop1('padding-left');
@@ -9400,181 +9495,197 @@ var $author$project$Main$QueensJs = {$: 'QueensJs'};
 var $author$project$Main$X29C3 = {$: 'X29C3'};
 var $author$project$Main$allTalks = _List_fromArray(
 	[$author$project$Main$HashMaps, $author$project$Main$ElmOnlineMeetup, $author$project$Main$ElmEurope, $author$project$Main$MunichFrontend, $author$project$Main$DesertCodeCamp, $author$project$Main$QueensJs, $author$project$Main$X29C3]);
-var $author$project$Main$talkView = function (talk) {
-	var year = function () {
-		switch (talk.$) {
-			case 'HashMaps':
-				return '2022';
-			case 'ElmOnlineMeetup':
-				return '2021';
-			case 'ElmEurope':
-				return '2019';
-			case 'MunichFrontend':
-				return '2018';
-			case 'DesertCodeCamp':
-				return '2016';
-			case 'QueensJs':
-				return '2016';
-			default:
-				return '2012';
-		}
-	}();
-	var title = function () {
-		switch (talk.$) {
-			case 'HashMaps':
-				return 'Hash Maps';
-			case 'ElmOnlineMeetup':
-				return 'Analytics and Architecture in Elm';
-			case 'ElmEurope':
-				return 'What has excited me about Audio Synthesis Theory';
-			case 'MunichFrontend':
-				return 'Using Elm at Shore';
-			case 'DesertCodeCamp':
-				return 'How React works under the hood';
-			case 'QueensJs':
-				return 'CtPaint';
-			default:
-				return 'Lightning Talk on Audio Synthesizer';
-		}
-	}();
-	var maybeUrl = function () {
-		switch (talk.$) {
-			case 'HashMaps':
-				return $elm$core$Maybe$Just('https://www.youtube.com/watch?v=mJFoGR1w28Q');
-			case 'ElmOnlineMeetup':
-				return $elm$core$Maybe$Just('https://youtu.be/XlJuICG2kFU');
-			case 'ElmEurope':
-				return $elm$core$Maybe$Just('https://www.youtube.com/watch?v=RFCPAw5C5hQ');
-			case 'MunichFrontend':
-				return $elm$core$Maybe$Nothing;
-			case 'DesertCodeCamp':
-				return $elm$core$Maybe$Just('https://youtu.be/e6jzkoGeDEs');
-			case 'QueensJs':
-				return $elm$core$Maybe$Nothing;
-			default:
-				return $elm$core$Maybe$Nothing;
-		}
-	}();
-	var titleView = function () {
-		var withQuotes = '\"' + (title + '\"');
-		if (maybeUrl.$ === 'Just') {
-			var url = maybeUrl.a;
-			return A2(
-				$rtfeldman$elm_css$Html$Styled$a,
-				_List_fromArray(
-					[
-						$rtfeldman$elm_css$Html$Styled$Attributes$href(url)
-					]),
-				_List_fromArray(
-					[
-						$author$project$Ext$Html$s(withQuotes)
-					]));
-		} else {
-			return $author$project$Ext$Html$s(withQuotes);
-		}
-	}();
-	var maybeSummary = function () {
-		switch (talk.$) {
-			case 'HashMaps':
-				return $elm$core$Maybe$Just('How Hashmaps work, as well as summarizing what\n                    I learned working on Roc\'s HashMap');
-			case 'ElmOnlineMeetup':
-				return $elm$core$Maybe$Just('In this talk I detail how I do frontend analytics\n                    in Elm, utilizing some tricks in Elm\'s type system to remind developers where they need to\n                    make changes.');
-			case 'ElmEurope':
-				return $elm$core$Maybe$Just('I demonstrate how to synthesize various instrument sounds in terms of the theories of\n                    additive synthesis and granular synthesis.');
-			case 'MunichFrontend':
-				return $elm$core$Maybe$Just('Shore\'s frontend lead engineer and I summarized what our experience has been\n                    with Elm.');
-			case 'DesertCodeCamp':
-				return $elm$core$Maybe$Just('My audience and I make React from scratch through incremental and small steps.');
-			case 'QueensJs':
-				return $elm$core$Maybe$Nothing;
-			default:
-				return $elm$core$Maybe$Nothing;
-		}
-	}();
-	var summaryView = function () {
-		if (maybeSummary.$ === 'Just') {
-			var summary = maybeSummary.a;
-			return A2(
-				$author$project$Ext$Html$row,
-				_List_fromArray(
-					[$author$project$Main$descriptionColor]),
-				_List_fromArray(
-					[
-						$author$project$Ext$Html$s(summary)
-					]));
-		} else {
-			return $author$project$Ext$Html$s('');
-		}
-	}();
-	var maybeEvent = function () {
-		switch (talk.$) {
-			case 'HashMaps':
-				return $elm$core$Maybe$Nothing;
-			case 'ElmOnlineMeetup':
-				return $elm$core$Maybe$Just('Elm Online Meetup');
-			case 'ElmEurope':
-				return $elm$core$Maybe$Just('Elm Europe');
-			case 'MunichFrontend':
-				return $elm$core$Maybe$Just('Munich Frontend');
-			case 'DesertCodeCamp':
-				return $elm$core$Maybe$Just('Desert Code Camp');
-			case 'QueensJs':
-				return $elm$core$Maybe$Just('QueensJs');
-			default:
-				return $elm$core$Maybe$Just('29C3');
-		}
-	}();
-	var eventView = function () {
-		if (maybeEvent.$ === 'Just') {
-			var event = maybeEvent.a;
-			return $author$project$Ext$Html$s(' at ' + event);
-		} else {
-			return $author$project$Ext$Html$s('');
-		}
-	}();
+var $author$project$Main$talkView = F2(
+	function (audience, talk) {
+		var year = function () {
+			switch (talk.$) {
+				case 'HashMaps':
+					return '2022';
+				case 'ElmOnlineMeetup':
+					return '2021';
+				case 'ElmEurope':
+					return '2019';
+				case 'MunichFrontend':
+					return '2018';
+				case 'DesertCodeCamp':
+					return '2016';
+				case 'QueensJs':
+					return '2016';
+				default:
+					return '2012';
+			}
+		}();
+		var title = function () {
+			switch (talk.$) {
+				case 'HashMaps':
+					return 'Hash Maps';
+				case 'ElmOnlineMeetup':
+					return 'Analytics and Architecture in Elm';
+				case 'ElmEurope':
+					return 'What has excited me about Audio Synthesis Theory';
+				case 'MunichFrontend':
+					return 'Using Elm at Shore';
+				case 'DesertCodeCamp':
+					return 'How React works under the hood';
+				case 'QueensJs':
+					return 'CtPaint';
+				default:
+					return 'Lightning Talk on Audio Synthesizer';
+			}
+		}();
+		var maybeUrl = function () {
+			switch (talk.$) {
+				case 'HashMaps':
+					return $elm$core$Maybe$Just('https://www.youtube.com/watch?v=mJFoGR1w28Q');
+				case 'ElmOnlineMeetup':
+					return $elm$core$Maybe$Just('https://youtu.be/XlJuICG2kFU');
+				case 'ElmEurope':
+					return $elm$core$Maybe$Just('https://www.youtube.com/watch?v=RFCPAw5C5hQ');
+				case 'MunichFrontend':
+					return $elm$core$Maybe$Nothing;
+				case 'DesertCodeCamp':
+					return $elm$core$Maybe$Just('https://youtu.be/e6jzkoGeDEs');
+				case 'QueensJs':
+					return $elm$core$Maybe$Nothing;
+				default:
+					return $elm$core$Maybe$Nothing;
+			}
+		}();
+		var titleView = function () {
+			var withQuotes = '\"' + (title + '\"');
+			if (maybeUrl.$ === 'Just') {
+				var url = maybeUrl.a;
+				return A2(
+					$rtfeldman$elm_css$Html$Styled$a,
+					_List_fromArray(
+						[
+							$rtfeldman$elm_css$Html$Styled$Attributes$href(url)
+						]),
+					_List_fromArray(
+						[
+							$author$project$Ext$Html$s(withQuotes)
+						]));
+			} else {
+				return $author$project$Ext$Html$s(withQuotes);
+			}
+		}();
+		var maybeSummary = function () {
+			switch (talk.$) {
+				case 'HashMaps':
+					return $elm$core$Maybe$Just('How Hashmaps work, as well as summarizing what\n                    I learned working on Roc\'s HashMap');
+				case 'ElmOnlineMeetup':
+					return $elm$core$Maybe$Just('In this talk I detail how I do frontend analytics\n                    in Elm, utilizing some tricks in Elm\'s type system to remind developers where they need to\n                    make changes.');
+				case 'ElmEurope':
+					return $elm$core$Maybe$Just('I demonstrate how to synthesize various instrument sounds in terms of the theories of\n                    additive synthesis and granular synthesis.');
+				case 'MunichFrontend':
+					return $elm$core$Maybe$Just('Shore\'s frontend lead engineer and I summarized what our experience has been\n                    with Elm.');
+				case 'DesertCodeCamp':
+					return $elm$core$Maybe$Just('My audience and I make React from scratch through incremental and small steps.');
+				case 'QueensJs':
+					return $elm$core$Maybe$Nothing;
+				default:
+					return $elm$core$Maybe$Nothing;
+			}
+		}();
+		var summaryView = function () {
+			if (maybeSummary.$ === 'Just') {
+				var summary = maybeSummary.a;
+				return A2(
+					$author$project$Ext$Html$row,
+					_List_fromArray(
+						[
+							$author$project$Main$descriptionColor(audience)
+						]),
+					_List_fromArray(
+						[
+							$author$project$Ext$Html$s(summary)
+						]));
+			} else {
+				return $author$project$Ext$Html$s('');
+			}
+		}();
+		var maybeEvent = function () {
+			switch (talk.$) {
+				case 'HashMaps':
+					return $elm$core$Maybe$Nothing;
+				case 'ElmOnlineMeetup':
+					return $elm$core$Maybe$Just('Elm Online Meetup');
+				case 'ElmEurope':
+					return $elm$core$Maybe$Just('Elm Europe');
+				case 'MunichFrontend':
+					return $elm$core$Maybe$Just('Munich Frontend');
+				case 'DesertCodeCamp':
+					return $elm$core$Maybe$Just('Desert Code Camp');
+				case 'QueensJs':
+					return $elm$core$Maybe$Just('QueensJs');
+				default:
+					return $elm$core$Maybe$Just('29C3');
+			}
+		}();
+		var eventView = function () {
+			if (maybeEvent.$ === 'Just') {
+				var event = maybeEvent.a;
+				return $author$project$Ext$Html$s(' at ' + event);
+			} else {
+				return $author$project$Ext$Html$s('');
+			}
+		}();
+		var detailsColor = _Utils_eq(audience, $author$project$Main$TraditionalHr) ? $author$project$Style$none : $author$project$Style$textGray4;
+		return A2(
+			$author$project$Ext$Html$col,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$author$project$Ext$Html$row,
+					_List_fromArray(
+						[$author$project$Style$justifySpaceBetween]),
+					_List_fromArray(
+						[
+							A2(
+							$rtfeldman$elm_css$Html$Styled$div,
+							_List_fromArray(
+								[
+									$rtfeldman$elm_css$Html$Styled$Attributes$css(
+									_List_fromArray(
+										[detailsColor]))
+								]),
+							_List_fromArray(
+								[titleView, eventView])),
+							A2(
+							$author$project$Ext$Html$row,
+							_List_fromArray(
+								[detailsColor]),
+							_List_fromArray(
+								[
+									$author$project$Ext$Html$s(year)
+								]))
+						])),
+					summaryView
+				]));
+	});
+var $author$project$Main$talks = function (audience) {
 	return A2(
 		$author$project$Ext$Html$col,
 		_List_fromArray(
-			[$author$project$Style$textGray4]),
-		_List_fromArray(
-			[
-				A2(
+			[$author$project$Style$g2]),
+		A2(
+			$elm$core$List$cons,
+			A2(
 				$author$project$Ext$Html$row,
 				_List_fromArray(
-					[$author$project$Style$justifySpaceBetween]),
+					[
+						$author$project$Main$mainSectionColor(audience)
+					]),
 				_List_fromArray(
 					[
-						A2(
-						$rtfeldman$elm_css$Html$Styled$div,
-						_List_Nil,
-						_List_fromArray(
-							[titleView, eventView])),
-						A2(
-						$author$project$Ext$Html$row,
-						_List_Nil,
-						_List_fromArray(
-							[
-								$author$project$Ext$Html$s(year)
-							]))
+						$author$project$Ext$Html$s('talks')
 					])),
-				summaryView
-			]));
+			A2(
+				$elm$core$List$map,
+				$author$project$Main$talkView(audience),
+				$author$project$Main$allTalks)));
 };
-var $author$project$Main$talks = A2(
-	$author$project$Ext$Html$col,
-	_List_fromArray(
-		[$author$project$Style$g2]),
-	A2(
-		$elm$core$List$cons,
-		A2(
-			$author$project$Ext$Html$row,
-			_List_fromArray(
-				[$author$project$Style$textYellow4]),
-			_List_fromArray(
-				[
-					$author$project$Ext$Html$s('talks')
-				])),
-		A2($elm$core$List$map, $author$project$Main$talkView, $author$project$Main$allTalks)));
 var $author$project$Main$resume = function (audience) {
 	return _List_fromArray(
 		[
@@ -9587,9 +9698,9 @@ var $author$project$Main$resume = function (audience) {
 				[
 					$author$project$Main$jobs(audience),
 					$author$project$Main$projects(audience),
-					$author$project$Main$talks,
+					$author$project$Main$talks(audience),
 					$author$project$Main$awards(audience),
-					$author$project$Main$educationAndVolunteering
+					$author$project$Main$educationAndVolunteering(audience)
 				]))
 		]);
 };

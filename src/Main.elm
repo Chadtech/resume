@@ -81,6 +81,7 @@ type Award
 type Audience
     = Normal
     | FrontendRustRecruiter
+    | TraditionalHr
 
 
 
@@ -112,6 +113,9 @@ flagsDecoder =
                                 case audience of
                                     "frontend-rust-recruiter" ->
                                         JD.succeed FrontendRustRecruiter
+
+                                    "traditional-hr" ->
+                                        JD.succeed TraditionalHr
 
                                     _ ->
                                         JD.fail ("Unknown audience: " ++ audience)
@@ -181,11 +185,11 @@ allProjects : Audience -> List Project
 allProjects audience =
     [ Just Roc
     , case audience of
-        Normal ->
-            Nothing
-
         FrontendRustRecruiter ->
             Just FightLines
+
+        _ ->
+            Nothing
     , Just Radler
     , Just CtPaint
     , Just ListExtra
@@ -194,6 +198,9 @@ allProjects audience =
     , Just Himesama
     , case audience of
         Normal ->
+            Just SolafideForbesNashMachine
+
+        TraditionalHr ->
             Just SolafideForbesNashMachine
 
         FrontendRustRecruiter ->
@@ -337,46 +344,70 @@ resume audience =
         ]
         [ jobs audience
         , projects audience
-        , talks
+        , talks audience
         , awards audience
-        , educationAndVolunteering
+        , educationAndVolunteering audience
         ]
     ]
 
 
-educationAndVolunteering : Html Msg
-educationAndVolunteering =
+educationAndVolunteering : Audience -> Html Msg
+educationAndVolunteering audience =
     H.row
         [ S.g2
         ]
-        [ education, volunteering ]
+        [ education audience
+        , volunteering audience
+        ]
 
 
-education : Html Msg
-education =
+education : Audience -> Html Msg
+education audience =
+    let
+        color : Css.Style
+        color =
+            if audience == TraditionalHr then
+                S.textGray1
+
+            else
+                S.textGray5
+    in
     H.col
-        [ S.textGray4
+        [ color
         , S.flex1
         ]
         [ H.row
-            [ S.textYellow4 ]
+            [ mainSectionColor audience ]
             [ H.s "education" ]
-        , H.row [ S.textGray5 ] [ H.s "Arizona State University" ]
+        , H.row
+            [ descriptionColor audience ]
+            [ H.s "Arizona State University" ]
         , H.row [] [ H.s "Bachelor of Science in Economics" ]
         , H.row [] [ H.s "Graduated 2013" ]
         ]
 
 
-volunteering : Html Msg
-volunteering =
+volunteering : Audience -> Html Msg
+volunteering audience =
+    let
+        color : Css.Style
+        color =
+            if audience == TraditionalHr then
+                S.textGray1
+
+            else
+                S.textGray5
+    in
     H.col
-        [ S.textGray4
+        [ color
         , S.flex1
         ]
         [ H.row
-            [ S.textYellow4 ]
+            [ mainSectionColor audience ]
             [ H.s "volunteering" ]
-        , H.row [ S.textGray5 ] [ H.s "HeatSync Labs, 501(c)(3) non-profit" ]
+        , H.row
+            [ descriptionColor audience ]
+            [ H.s "HeatSync Labs, 501(c)(3) non-profit" ]
         , H.row [] [ H.s "Treasurer and active member" ]
         , H.row [] [ H.s "2012 to 2014" ]
         ]
@@ -384,22 +415,30 @@ volunteering =
 
 awards : Audience -> Html Msg
 awards audience =
-    case audience of
-        Normal ->
+    let
+        awards_ : Html Msg
+        awards_ =
             H.col
                 []
                 (H.row
-                    [ S.textYellow4 ]
+                    [ mainSectionColor audience ]
                     [ H.s "awards" ]
-                    :: List.map awardView allAwards
+                    :: List.map (awardView audience) allAwards
                 )
+    in
+    case audience of
+        Normal ->
+            awards_
 
         FrontendRustRecruiter ->
             Html.text ""
 
+        TraditionalHr ->
+            awards_
 
-awardView : Award -> Html Msg
-awardView award =
+
+awardView : Audience -> Award -> Html Msg
+awardView audience award =
     let
         name : String
         name =
@@ -432,7 +471,7 @@ awardView award =
         []
         [ H.row
             [ S.justifySpaceBetween
-            , S.textGray4
+            , descriptionColor audience
             ]
             [ Html.div
                 []
@@ -453,10 +492,19 @@ jobs audience =
         [ S.g2
         ]
         (H.row
-            [ S.textYellow4 ]
+            [ mainSectionColor audience ]
             [ H.s "jobs" ]
             :: List.map (jobView audience) allJobs
         )
+
+
+mainSectionColor : Audience -> Css.Style
+mainSectionColor audience =
+    if audience == TraditionalHr then
+        S.textGray3
+
+    else
+        S.textYellow4
 
 
 jobView : Audience -> Job -> Html Msg
@@ -622,11 +670,11 @@ jobView audience job =
                         firstTwo : List String
                         firstTwo =
                             case audience of
-                                Normal ->
-                                    [ "Elm", "Rust" ]
-
                                 FrontendRustRecruiter ->
                                     [ "Rust", "Elm" ]
+
+                                _ ->
+                                    [ "Elm", "Rust" ]
                     in
                     firstTwo
                         ++ [ "Python"
@@ -738,16 +786,16 @@ application, streamlining the deployment and development of AI agents.
                      """
                     ]
                         ++ (case audience of
-                                Normal ->
-                                    [ """Acted as a liaison between management and the engineering team, proactively coordinating
-the efforts of individual developers. Fostering trust and ensuring project clarity through communication and understanding."""
-                                    ]
-
                                 FrontendRustRecruiter ->
                                     [ """Guided development of logging system shared across several concurrent AI operations."""
                                     , """Built a database migration framework to keep various local and production instances of our database in sync."""
                                     , """Created build tools for compiling and constructing SDKs on file change."""
                                     , """Using dependency injection to mock external services, I developed our system for integration tests of our AI pipeline."""
+                                    ]
+
+                                _ ->
+                                    [ """Acted as a liaison between management and the engineering team, proactively coordinating
+the efforts of individual developers. Fostering trust and ensuring project clarity through communication and understanding."""
                                     ]
                            )
 
@@ -800,36 +848,52 @@ research, discussion, and experimentation."""
         bulletPointView : String -> Html msg
         bulletPointView bulletPoint =
             H.row
-                [ descriptionColor ]
+                [ descriptionColor audience ]
                 [ H.s <| "- " ++ bulletPoint ]
+
+        nameAndRoleColor : Css.Style
+        nameAndRoleColor =
+            if audience == TraditionalHr then
+                S.textBlue0
+
+            else
+                S.textYellow5
+
+        timeFrameColor : Css.Style
+        timeFrameColor =
+            if audience == TraditionalHr then
+                S.textGray1
+
+            else
+                S.textGray3
     in
     H.col
         []
         [ H.row
             [ S.justifySpaceBetween ]
             [ H.row
-                [ S.textYellow5 ]
+                [ nameAndRoleColor ]
                 [ H.s name ]
             , H.row
-                [ S.textYellow5 ]
+                [ nameAndRoleColor ]
                 [ H.s role ]
             ]
         , H.row
             [ S.g2
-            , S.textGray3
+            , timeFrameColor
             ]
             [ H.s <| timeFrameStr ++ acquisitionStr
             ]
         , Html.div
-            [ Attr.css [ techColor ] ]
+            [ Attr.css [ techColor audience ] ]
             [ Html.span
-                [ Attr.css [ S.textGray4 ] ]
+                [ Attr.css [ techLabelColor audience ] ]
                 [ H.s "tech: " ]
             , H.s <| String.join ", " jobTech
             ]
         , H.row
-            [ descriptionColor
-            , S.textSm
+            [ descriptionColor audience
+            , descriptionSize audience
             , S.fontItalic
             ]
             [ H.s description ]
@@ -839,30 +903,47 @@ research, discussion, and experimentation."""
         ]
 
 
-descriptionColor : Css.Style
-descriptionColor =
-    S.textGray5
+descriptionColor : Audience -> Css.Style
+descriptionColor audience =
+    if audience == TraditionalHr then
+        S.none
+
+    else
+        S.textGray5
 
 
-techColor : Css.Style
-techColor =
-    S.textRed1
+techLabelColor : Audience -> Css.Style
+techLabelColor audience =
+    if audience == TraditionalHr then
+        S.textRed0
+
+    else
+        S.textGray4
 
 
-talks : Html Msg
-talks =
+techColor : Audience -> Css.Style
+techColor audience =
+    if audience == TraditionalHr then
+        S.textRed0
+
+    else
+        S.textRed1
+
+
+talks : Audience -> Html Msg
+talks audience =
     H.col
         [ S.g2
         ]
         (H.row
-            [ S.textYellow4 ]
+            [ mainSectionColor audience ]
             [ H.s "talks" ]
-            :: List.map talkView allTalks
+            :: List.map (talkView audience) allTalks
         )
 
 
-talkView : Talk -> Html Msg
-talkView talk =
+talkView : Audience -> Talk -> Html Msg
+talkView audience talk =
     let
         title : String
         title =
@@ -1019,22 +1100,32 @@ talkView talk =
             case maybeSummary of
                 Just summary ->
                     H.row
-                        [ descriptionColor ]
+                        [ descriptionColor audience ]
                         [ H.s summary ]
 
                 Nothing ->
                     H.s ""
+
+        detailsColor : Css.Style
+        detailsColor =
+            if audience == TraditionalHr then
+                S.none
+
+            else
+                S.textGray4
     in
     H.col
-        [ S.textGray4 ]
+        []
         [ H.row
             [ S.justifySpaceBetween ]
             [ Html.div
-                []
+                [ Attr.css
+                    [ detailsColor ]
+                ]
                 [ titleView
                 , eventView
                 ]
-            , H.row [] [ H.s year ]
+            , H.row [ detailsColor ] [ H.s year ]
             ]
         , summaryView
         ]
@@ -1046,14 +1137,14 @@ projects audience =
         [ S.g2
         ]
         (H.row
-            [ S.textYellow4 ]
+            [ mainSectionColor audience ]
             [ H.s "projects" ]
-            :: List.map projectView (allProjects audience)
+            :: List.map (projectView audience) (allProjects audience)
         )
 
 
-projectView : Project -> Html Msg
-projectView project =
+projectView : Audience -> Project -> Html Msg
+projectView audience project =
     let
         projectName : String
         projectName =
@@ -1225,7 +1316,7 @@ wooden enclosures I designed and laser cut."""
                     bulletPointView : String -> Html msg
                     bulletPointView bulletPoint =
                         H.row
-                            [ descriptionColor ]
+                            [ descriptionColor audience ]
                             [ H.s <| "- " ++ bulletPoint ]
                 in
                 H.col
@@ -1233,7 +1324,7 @@ wooden enclosures I designed and laser cut."""
                     (List.map bulletPointView bulletPoints)
     in
     H.col
-        [ S.textGray4 ]
+        []
         [ H.row
             [ S.justifySpaceBetween ]
             [ Html.a
@@ -1241,20 +1332,29 @@ wooden enclosures I designed and laser cut."""
                 [ H.s projectName ]
             ]
         , Html.div
-            [ Attr.css [ techColor ] ]
+            [ Attr.css [ techColor audience ] ]
             [ Html.span
-                [ Attr.css [ S.textGray4 ] ]
+                [ Attr.css [ techLabelColor audience ] ]
                 [ H.s "tech: " ]
             , H.s <| String.join ", " tech
             ]
         , H.row
-            [ descriptionColor
-            , S.textSm
+            [ descriptionColor audience
+            , descriptionSize audience
             , S.fontItalic
             ]
             [ H.s description ]
         , bulletPointsView
         ]
+
+
+descriptionSize : Audience -> Css.Style
+descriptionSize audience =
+    if audience == TraditionalHr then
+        S.none
+
+    else
+        S.textSm
 
 
 nameAndInfo : Html Msg
@@ -1318,15 +1418,20 @@ globalStyles model =
     let
         bg : Css.Style
         bg =
-            case model.format of
-                ViewFormat.Web ->
-                    S.bgGray1
+            case model.audience of
+                TraditionalHr ->
+                    S.bgWhite
 
-                ViewFormat.Pdf ->
-                    S.bgNightwood1
+                _ ->
+                    case model.format of
+                        ViewFormat.Web ->
+                            S.bgGray1
 
-                ViewFormat.ThankYou _ ->
-                    S.bgNightwood1
+                        ViewFormat.Pdf ->
+                            S.bgNightwood1
+
+                        ViewFormat.ThankYou _ ->
+                            S.bgNightwood1
 
         viewFormatStyles : List Css.Style
         viewFormatStyles =
@@ -1340,9 +1445,26 @@ globalStyles model =
                     , S.g2
                     ]
 
-                ViewFormat.ThankYou record ->
+                ViewFormat.ThankYou _ ->
                     [ S.justifyCenter
                     , S.itemsCenter
+                    ]
+
+        fonts : List String
+        fonts =
+            case model.audience of
+                TraditionalHr ->
+                    [ "Inter"
+                    , "Helvetica"
+                    , "Arial"
+                    , "sans-serif"
+                    ]
+
+                _ ->
+                    [ "'JetBrains Mono'"
+                    , "inter"
+                    , "monospace"
+                    , "sans-serif"
                     ]
     in
     Css.Global.global
@@ -1352,12 +1474,7 @@ globalStyles model =
             [ bg ]
         , Css.Global.body
             [ S.batch viewFormatStyles
-            , Css.fontFamilies
-                [ "'JetBrains Mono'"
-                , "inter"
-                , "monospace"
-                , "sans-serif"
-                ]
+            , Css.fontFamilies fonts
             , S.col
             , S.m0
             , bg

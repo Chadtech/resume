@@ -5,6 +5,7 @@ module Style exposing
     , bgGray4
     , bgNightwood1
     , bgNone
+    , bgWhite
     , bgYellow1
     , block
     , border
@@ -222,6 +223,7 @@ module Style exposing
     , textLg
     , textMd
     , textPrimary
+    , textRed0
     , textRed1
     , textSm
     , textXl
@@ -1239,6 +1241,11 @@ bgGray4 =
     Css.property "background" gray4Str
 
 
+bgWhite : Css.Style
+bgWhite =
+    Css.property "background" "#FFFFFF"
+
+
 textGray0 : Css.Style
 textGray0 =
     Css.property "color" gray0Str
@@ -1292,6 +1299,11 @@ textYellow5 =
 textRed1 : Css.Style
 textRed1 =
     Css.property "color" red1Str
+
+
+textRed0 : Css.Style
+textRed0 =
+    Css.property "color" red0Str
 
 
 setBgColorVar : String -> Css.Style

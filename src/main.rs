@@ -162,9 +162,9 @@ fn deploy(view_format: ViewFormat, domain: String) -> Result<(), String> {
     Command::new("surge")
         .args(["./public", domain.as_str()])
         .spawn()
-        .map_err(|err| format!("A {}", err.to_string()))?
+        .map_err(|err| format!("Spawn Surge Error {}", err.to_string()))?
         .wait()
-        .map_err(|err| format!("B {}", err.to_string()))?;
+        .map_err(|err| format!("Wait Surge Error {}", err.to_string()))?;
 
     Ok(())
 }

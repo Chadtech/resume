@@ -31,6 +31,10 @@
                     return 'frontend-rust-recruiter';
                 }
 
+                if (location.href.includes('audience=traditional-hr')) {
+                    return 'traditional-hr';
+                }
+
                 return null
             }()
         }
